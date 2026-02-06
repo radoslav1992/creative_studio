@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Не сте автентикирани. Моля, влезте в системата.' },
+        { status: 401 }
+      );
+    }
+
     const apiToken = process.env.REPLICATE_API_TOKEN;
 
     if (!apiToken) {
@@ -14,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { model, input } = body;
+    const { model, input, generationId } = body;
 
     if (!model || !input) {
       return NextResponse.json(
@@ -43,10 +54,27 @@ export async function POST(request: NextRequest) {
       const errorData = await response.json().catch(() => null);
       const errorMessage =
         errorData?.detail || errorData?.error || `Replicate API грешка: ${response.status}`;
+
+      // Update DB generation if exists
+      if (generationId) {
+        await prisma.generation.update({
+          where: { id: generationId },
+          data: { status: 'failed', error: errorMessage },
+        }).catch(() => {});
+      }
+
       return NextResponse.json({ error: errorMessage }, { status: response.status });
     }
 
     const data = await response.json();
+
+    // Update DB generation with replicate prediction ID
+    if (generationId) {
+      await prisma.generation.update({
+        where: { id: generationId },
+        data: { replicateId: data.id, status: 'processing' },
+      }).catch(() => {});
+    }
 
     return NextResponse.json({
       id: data.id,

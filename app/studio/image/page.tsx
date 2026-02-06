@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Image as ImageIcon, Sparkles, Wand2 } from 'lucide-react';
 import { imageModels } from '@/lib/models';
 import { ModelConfig, Generation } from '@/lib/types';
@@ -8,6 +8,7 @@ import { ModelSelector } from '@/components/ModelSelector';
 import { ParameterControls } from '@/components/ParameterControls';
 import { GenerationResult } from '@/components/GenerationResult';
 import { StudioLayout } from '@/components/StudioLayout';
+import { PromptEnhancer } from '@/components/PromptEnhancer';
 import { useStore } from '@/lib/store';
 import { toast } from 'sonner';
 
@@ -17,8 +18,15 @@ export default function ImageStudioPage() {
   const [paramValues, setParamValues] = useState<Record<string, any>>({});
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const { generations, addGeneration, updateGeneration } = useStore();
+  const { generations, addGeneration, updateGeneration, loadGenerations, isLoaded } = useStore();
   const imageGenerations = generations.filter((g) => g.category === 'image');
+
+  // Load generations from DB on mount
+  useEffect(() => {
+    if (!isLoaded) {
+      loadGenerations();
+    }
+  }, [isLoaded, loadGenerations]);
 
   const handleModelSelect = useCallback((model: ModelConfig) => {
     setSelectedModel(model);
@@ -58,23 +66,41 @@ export default function ImageStudioPage() {
 
     setIsGenerating(true);
 
-    const generationId = `gen_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    const generation: Generation = {
-      id: generationId,
-      modelId: selectedModel.id,
-      modelName: selectedModel.name,
-      prompt: prompt.trim(),
-      status: 'starting',
-      createdAt: new Date().toISOString(),
-      category: 'image',
-    };
-
-    addGeneration(generation);
-    toast('Генерирането е стартирано', {
-      description: `Модел: ${selectedModel.name}`,
-    });
-
     try {
+      // Create generation in DB first
+      const createRes = await fetch('/api/generations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          modelId: selectedModel.id,
+          modelName: selectedModel.name,
+          prompt: prompt.trim(),
+          category: 'image',
+        }),
+      });
+
+      if (!createRes.ok) {
+        const errData = await createRes.json();
+        throw new Error(errData.error || 'Грешка при създаване на генерация');
+      }
+
+      const dbGeneration = await createRes.json();
+
+      const generation: Generation = {
+        id: dbGeneration.id,
+        modelId: selectedModel.id,
+        modelName: selectedModel.name,
+        prompt: prompt.trim(),
+        status: 'starting',
+        createdAt: dbGeneration.createdAt,
+        category: 'image',
+      };
+
+      addGeneration(generation);
+      toast('Генерирането е стартирано', {
+        description: `Модел: ${selectedModel.name}`,
+      });
+
       const input: Record<string, any> = {
         prompt: prompt.trim(),
       };
@@ -97,6 +123,7 @@ export default function ImageStudioPage() {
         body: JSON.stringify({
           model: selectedModel.replicateId,
           input,
+          generationId: dbGeneration.id,
         }),
       });
 
@@ -106,13 +133,9 @@ export default function ImageStudioPage() {
         throw new Error(data.error || 'Грешка при генерирането');
       }
 
-      updateGeneration(generationId, { status: 'processing' });
-      pollForResult(generationId, data.id);
+      updateGeneration(dbGeneration.id, { status: 'processing', replicateId: data.id });
+      pollForResult(dbGeneration.id, data.id);
     } catch (error: any) {
-      updateGeneration(generationId, {
-        status: 'failed',
-        error: error.message,
-      });
       toast.error('Грешка при генерирането', {
         description: error.message,
       });
@@ -200,11 +223,19 @@ export default function ImageStudioPage() {
 
               {/* Prompt */}
               <div className="space-y-3">
-                <label className="flex items-center gap-1.5 text-sm font-semibold text-zinc-300">
-                  <Wand2 className="w-4 h-4 text-brand-400" />
-                  Промпт
-                  <span className="text-brand-400">*</span>
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-1.5 text-sm font-semibold text-zinc-300">
+                    <Wand2 className="w-4 h-4 text-brand-400" />
+                    Промпт
+                    <span className="text-brand-400">*</span>
+                  </label>
+                  <PromptEnhancer
+                    prompt={prompt}
+                    category="image"
+                    onEnhanced={setPrompt}
+                    disabled={isGenerating}
+                  />
+                </div>
                 <div className="relative">
                   <textarea
                     value={prompt}
