@@ -8,6 +8,7 @@ import { ModelSelector } from '@/components/ModelSelector';
 import { ParameterControls } from '@/components/ParameterControls';
 import { GenerationResult } from '@/components/GenerationResult';
 import { StudioLayout } from '@/components/StudioLayout';
+import { PromptEnhancer } from '@/components/PromptEnhancer';
 import { useStore } from '@/lib/store';
 import { toast } from 'sonner';
 
@@ -222,11 +223,19 @@ export default function ImageStudioPage() {
 
               {/* Prompt */}
               <div className="space-y-3">
-                <label className="flex items-center gap-1.5 text-sm font-semibold text-zinc-300">
-                  <Wand2 className="w-4 h-4 text-brand-400" />
-                  Промпт
-                  <span className="text-brand-400">*</span>
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-1.5 text-sm font-semibold text-zinc-300">
+                    <Wand2 className="w-4 h-4 text-brand-400" />
+                    Промпт
+                    <span className="text-brand-400">*</span>
+                  </label>
+                  <PromptEnhancer
+                    prompt={prompt}
+                    category="image"
+                    onEnhanced={setPrompt}
+                    disabled={isGenerating}
+                  />
+                </div>
                 <div className="relative">
                   <textarea
                     value={prompt}

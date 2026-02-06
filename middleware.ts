@@ -13,5 +13,6 @@ export const config = {
     '/profile/:path*',
     '/api/generate/:path*',
     '/api/generations/:path*',
+    '/api/enhance-prompt/:path*',
   ],
 };
