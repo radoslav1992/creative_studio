@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Video, Sparkles, Wand2 } from 'lucide-react';
 import { videoModels } from '@/lib/models';
 import { ModelConfig, Generation } from '@/lib/types';
@@ -17,8 +17,15 @@ export default function VideoStudioPage() {
   const [paramValues, setParamValues] = useState<Record<string, any>>({});
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const { generations, addGeneration, updateGeneration } = useStore();
+  const { generations, addGeneration, updateGeneration, loadGenerations, isLoaded } = useStore();
   const videoGenerations = generations.filter((g) => g.category === 'video');
+
+  // Load generations from DB on mount
+  useEffect(() => {
+    if (!isLoaded) {
+      loadGenerations();
+    }
+  }, [isLoaded, loadGenerations]);
 
   const handleModelSelect = useCallback((model: ModelConfig) => {
     setSelectedModel(model);
@@ -48,23 +55,41 @@ export default function VideoStudioPage() {
 
     setIsGenerating(true);
 
-    const generationId = `gen_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    const generation: Generation = {
-      id: generationId,
-      modelId: selectedModel.id,
-      modelName: selectedModel.name,
-      prompt: prompt.trim(),
-      status: 'starting',
-      createdAt: new Date().toISOString(),
-      category: 'video',
-    };
-
-    addGeneration(generation);
-    toast('Генерирането е стартирано', {
-      description: `Модел: ${selectedModel.name}`,
-    });
-
     try {
+      // Create generation in DB first
+      const createRes = await fetch('/api/generations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          modelId: selectedModel.id,
+          modelName: selectedModel.name,
+          prompt: prompt.trim(),
+          category: 'video',
+        }),
+      });
+
+      if (!createRes.ok) {
+        const errData = await createRes.json();
+        throw new Error(errData.error || 'Грешка при създаване на генерация');
+      }
+
+      const dbGeneration = await createRes.json();
+
+      const generation: Generation = {
+        id: dbGeneration.id,
+        modelId: selectedModel.id,
+        modelName: selectedModel.name,
+        prompt: prompt.trim(),
+        status: 'starting',
+        createdAt: dbGeneration.createdAt,
+        category: 'video',
+      };
+
+      addGeneration(generation);
+      toast('Генерирането е стартирано', {
+        description: `Модел: ${selectedModel.name}`,
+      });
+
       const input: Record<string, any> = {
         prompt: prompt.trim(),
       };
@@ -88,6 +113,7 @@ export default function VideoStudioPage() {
         body: JSON.stringify({
           model: selectedModel.replicateId,
           input,
+          generationId: dbGeneration.id,
         }),
       });
 
@@ -98,13 +124,9 @@ export default function VideoStudioPage() {
       }
 
       // Start polling for result
-      updateGeneration(generationId, { status: 'processing' });
-      pollForResult(generationId, data.id);
+      updateGeneration(dbGeneration.id, { status: 'processing', replicateId: data.id });
+      pollForResult(dbGeneration.id, data.id);
     } catch (error: any) {
-      updateGeneration(generationId, {
-        status: 'failed',
-        error: error.message,
-      });
       toast.error('Грешка при генерирането', {
         description: error.message,
       });

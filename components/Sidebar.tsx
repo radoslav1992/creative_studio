@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
 import { clsx } from 'clsx';
 import {
   Video,
@@ -11,6 +12,9 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
+  User,
+  LogOut,
+  Settings,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -39,7 +43,14 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
   const [collapsed, setCollapsed] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const isAuthenticated = status === 'authenticated';
+  const userInitial = session?.user?.name?.charAt(0)?.toUpperCase()
+    || session?.user?.email?.charAt(0)?.toUpperCase()
+    || 'U';
 
   return (
     <aside
@@ -109,11 +120,98 @@ export function Sidebar() {
         )}
       </button>
 
-      {/* Footer */}
-      <div className="px-4 py-3 border-t border-white/5">
-        {!collapsed && (
-          <div className="text-[11px] text-zinc-600">
-            Задвижвано от Replicate API
+      {/* User Section */}
+      <div className="border-t border-white/5">
+        {isAuthenticated ? (
+          <div className="relative">
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors"
+            >
+              {/* Avatar */}
+              {session?.user?.image ? (
+                <img
+                  src={session.user.image}
+                  alt={session.user.name || 'Потребител'}
+                  className="w-8 h-8 rounded-full flex-shrink-0"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-bold text-white">{userInitial}</span>
+                </div>
+              )}
+              {!collapsed && (
+                <div className="flex flex-col items-start overflow-hidden">
+                  <span className="text-sm font-medium text-white truncate max-w-[160px]">
+                    {session?.user?.name || 'Потребител'}
+                  </span>
+                  <span className="text-[10px] text-zinc-500 truncate max-w-[160px]">
+                    {session?.user?.email}
+                  </span>
+                </div>
+              )}
+            </button>
+
+            {/* User dropdown menu */}
+            {showUserMenu && (
+              <>
+                <div
+                  className="fixed inset-0 z-20"
+                  onClick={() => setShowUserMenu(false)}
+                />
+                <div className={clsx(
+                  'absolute z-30 bottom-full mb-1 rounded-xl bg-surface-400 border border-white/10 shadow-2xl overflow-hidden',
+                  collapsed ? 'left-1 w-48' : 'left-2 right-2'
+                )}>
+                  <Link
+                    href="/profile"
+                    onClick={() => setShowUserMenu(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/5 transition-colors"
+                  >
+                    <User className="w-4 h-4 text-zinc-500" />
+                    Профил
+                  </Link>
+                  <Link
+                    href="/profile"
+                    onClick={() => setShowUserMenu(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/5 transition-colors"
+                  >
+                    <Settings className="w-4 h-4 text-zinc-500" />
+                    Настройки
+                  </Link>
+                  <div className="border-t border-white/5" />
+                  <button
+                    onClick={() => {
+                      setShowUserMenu(false);
+                      signOut({ callbackUrl: '/' });
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Изход
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="px-3 py-3">
+            {collapsed ? (
+              <Link
+                href="/auth/login"
+                className="flex items-center justify-center w-full py-2 rounded-lg bg-brand-500/20 text-brand-400 hover:bg-brand-500/30 transition-colors"
+              >
+                <User className="w-4 h-4" />
+              </Link>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-gradient-to-r from-brand-600 to-brand-500 text-white text-sm font-medium hover:from-brand-500 hover:to-brand-400 transition-all"
+              >
+                <User className="w-4 h-4" />
+                Влезте
+              </Link>
+            )}
           </div>
         )}
       </div>

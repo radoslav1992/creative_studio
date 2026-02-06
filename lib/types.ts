@@ -41,10 +41,13 @@ export interface Generation {
   error?: string;
   createdAt: string;
   category: ModelCategory;
+  replicateId?: string;
 }
 
 export interface StoreState {
   generations: Generation[];
+  isLoaded: boolean;
+  loadGenerations: (category?: 'video' | 'image') => Promise<void>;
   addGeneration: (gen: Generation) => void;
   updateGeneration: (id: string, updates: Partial<Generation>) => void;
   removeGeneration: (id: string) => void;

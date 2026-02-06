@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +12,14 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Не сте автентикирани' },
+        { status: 401 }
+      );
+    }
+
     const apiToken = process.env.REPLICATE_API_TOKEN;
 
     if (!apiToken) {
@@ -37,6 +48,37 @@ export async function GET(
     }
 
     const data = await response.json();
+
+    // If the prediction is complete (succeeded or failed), update DB
+    if (data.status === 'succeeded' || data.status === 'failed' || data.status === 'canceled') {
+      try {
+        const dbGen = await prisma.generation.findFirst({
+          where: {
+            replicateId: id,
+            userId: session.user.id,
+          },
+        });
+
+        if (dbGen) {
+          const updateData: any = { status: data.status };
+          if (data.output) {
+            updateData.output = JSON.stringify(
+              typeof data.output === 'string' ? data.output : data.output
+            );
+          }
+          if (data.error) {
+            updateData.error = data.error;
+          }
+
+          await prisma.generation.update({
+            where: { id: dbGen.id },
+            data: updateData,
+          });
+        }
+      } catch (dbError) {
+        console.error('DB update error during status poll:', dbError);
+      }
+    }
 
     return NextResponse.json({
       id: data.id,

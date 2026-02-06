@@ -3,3 +3,7 @@ node_modules/
 .env
 .env.local
 out/
+
+# Prisma
+*.db
+*.db-journal

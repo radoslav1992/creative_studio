@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { LayoutGrid, Video, Image as ImageIcon, Trash2, Filter } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { LayoutGrid, Video, Image as ImageIcon, Filter } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { GenerationResult } from '@/components/GenerationResult';
 import { StudioLayout } from '@/components/StudioLayout';
@@ -11,7 +11,14 @@ type FilterType = 'all' | 'video' | 'image';
 
 export default function GalleryPage() {
   const [filter, setFilter] = useState<FilterType>('all');
-  const { generations } = useStore();
+  const { generations, loadGenerations, isLoaded } = useStore();
+
+  // Load generations from DB on mount
+  useEffect(() => {
+    if (!isLoaded) {
+      loadGenerations();
+    }
+  }, [isLoaded, loadGenerations]);
 
   const filteredGenerations =
     filter === 'all'
