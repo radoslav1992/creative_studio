@@ -2,10 +2,10 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Image as ImageIcon, Sparkles, Wand2 } from 'lucide-react';
-import { imageModels } from '@/lib/models';
-import { ModelConfig, Generation } from '@/lib/types';
-import { ModelSelector } from '@/components/ModelSelector';
-import { ParameterControls } from '@/components/ParameterControls';
+import { DynamicModel, Generation } from '@/lib/types';
+import { useModels } from '@/lib/use-models';
+import { DynamicModelSelector } from '@/components/DynamicModelSelector';
+import { DynamicParameterControls } from '@/components/DynamicParameterControls';
 import { GenerationResult } from '@/components/GenerationResult';
 import { StudioLayout } from '@/components/StudioLayout';
 import { PromptEnhancer } from '@/components/PromptEnhancer';
@@ -13,7 +13,8 @@ import { useStore } from '@/lib/store';
 import { toast } from 'sonner';
 
 export default function ImageStudioPage() {
-  const [selectedModel, setSelectedModel] = useState<ModelConfig | null>(null);
+  const { models, isLoading: modelsLoading } = useModels('image');
+  const [selectedModel, setSelectedModel] = useState<DynamicModel | null>(null);
   const [prompt, setPrompt] = useState('');
   const [paramValues, setParamValues] = useState<Record<string, any>>({});
   const [isGenerating, setIsGenerating] = useState(false);
@@ -21,21 +22,22 @@ export default function ImageStudioPage() {
   const { generations, addGeneration, updateGeneration, loadGenerations, isLoaded } = useStore();
   const imageGenerations = generations.filter((g) => g.category === 'image');
 
-  // Load generations from DB on mount
   useEffect(() => {
     if (!isLoaded) {
       loadGenerations();
     }
   }, [isLoaded, loadGenerations]);
 
-  const handleModelSelect = useCallback((model: ModelConfig) => {
+  const handleModelSelect = useCallback((model: DynamicModel) => {
     setSelectedModel(model);
     const defaults: Record<string, any> = {};
-    model.params.forEach((p) => {
-      if (p.default !== undefined) {
-        defaults[p.key] = p.default;
+    const props = model.inputSchema?.properties ?? {};
+    for (const [key, prop] of Object.entries(props)) {
+      if (key === 'prompt') continue;
+      if (prop.default !== undefined) {
+        defaults[key] = prop.default;
       }
-    });
+    }
     setParamValues(defaults);
   }, []);
 
@@ -53,13 +55,14 @@ export default function ImageStudioPage() {
       return;
     }
 
-    // Check for required image params
-    const requiredImageParams = selectedModel.params.filter(
-      (p) => p.required && (p.type === 'image' || p.type === 'images') && p.key !== 'prompt'
-    );
-    for (const param of requiredImageParams) {
-      if (!paramValues[param.key]) {
-        toast.error(`Моля, качете ${param.label.toLowerCase()}`);
+    // Check required params from schema
+    const required = new Set(selectedModel.inputSchema?.required ?? []);
+    for (const key of required) {
+      if (key === 'prompt') continue;
+      const val = paramValues[key];
+      if (val === undefined || val === null || val === '') {
+        const label = key.replace(/_/g, ' ');
+        toast.error(`Моля, попълнете: ${label}`);
         return;
       }
     }
@@ -67,12 +70,11 @@ export default function ImageStudioPage() {
     setIsGenerating(true);
 
     try {
-      // Create generation in DB first
       const createRes = await fetch('/api/generations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          modelId: selectedModel.id,
+          modelId: selectedModel.replicateId,
           modelName: selectedModel.name,
           prompt: prompt.trim(),
           category: 'image',
@@ -88,7 +90,7 @@ export default function ImageStudioPage() {
 
       const generation: Generation = {
         id: dbGeneration.id,
-        modelId: selectedModel.id,
+        modelId: selectedModel.replicateId,
         modelName: selectedModel.name,
         prompt: prompt.trim(),
         status: 'starting',
@@ -101,21 +103,19 @@ export default function ImageStudioPage() {
         description: `Модел: ${selectedModel.name}`,
       });
 
+      // Build API input from schema + values
       const input: Record<string, any> = {
         prompt: prompt.trim(),
       };
 
-      selectedModel.params.forEach((param) => {
-        if (param.key === 'prompt') return;
-        const val = paramValues[param.key] ?? param.default;
+      const props = selectedModel.inputSchema?.properties ?? {};
+      for (const [key, schemaProp] of Object.entries(props)) {
+        if (key === 'prompt') continue;
+        const val = paramValues[key] ?? schemaProp.default;
         if (val !== undefined && val !== null && val !== '' && !(Array.isArray(val) && val.length === 0)) {
-          if (param.type === 'number' || param.sendAsNumber) {
-            input[param.key] = Number(val);
-          } else {
-            input[param.key] = val;
-          }
+          input[key] = val;
         }
-      });
+      }
 
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -166,7 +166,7 @@ export default function ImageStudioPage() {
             error: data.error,
           });
           if (data.status === 'failed') {
-            toast.error('Генерирането не успя');
+            toast.error('Генерирането не успя', { description: data.error });
           }
           return;
         }
@@ -180,9 +180,15 @@ export default function ImageStudioPage() {
     poll();
   };
 
-  // Group capabilities for mode tabs
   const hasEditingCapability = selectedModel?.capabilities.includes('image-editing');
   const hasCharacterCapability = selectedModel?.capabilities.includes('character-consistency');
+  const hasAnyImageParam = selectedModel?.inputSchema?.properties
+    ? Object.keys(selectedModel.inputSchema.properties).some((k) =>
+        ['image', 'image_input', 'input_images', 'character_reference_image'].includes(k) && paramValues[k]
+      )
+    : false;
+
+  const promptDescription = selectedModel?.inputSchema?.properties?.prompt?.description;
 
   return (
     <StudioLayout
@@ -193,20 +199,19 @@ export default function ImageStudioPage() {
       <div className="grid grid-cols-1 xl:grid-cols-[1fr,480px] gap-6">
         {/* Left: Model selection + Generation */}
         <div className="space-y-6">
-          {/* Model Selector */}
           <section>
             <h2 className="text-sm font-semibold text-zinc-300 mb-4 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-brand-400" />
               Изберете модел
             </h2>
-            <ModelSelector
-              models={imageModels}
+            <DynamicModelSelector
+              models={models}
+              isLoading={modelsLoading}
               selectedModelId={selectedModel?.id ?? null}
               onSelect={handleModelSelect}
             />
           </section>
 
-          {/* Prompt + Controls */}
           {selectedModel && (
             <section className="animate-fade-in space-y-6">
               {/* Mode indicator for editing models */}
@@ -240,10 +245,7 @@ export default function ImageStudioPage() {
                   <textarea
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    placeholder={
-                      selectedModel.params.find((p) => p.key === 'prompt')?.placeholder ??
-                      'Опишете изображението, което искате да създадете...'
-                    }
+                    placeholder="Опишете изображението, което искате да създадете..."
                     rows={4}
                     className="w-full px-4 py-3 rounded-xl bg-surface-400 border border-white/5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/30 transition-all leading-relaxed"
                   />
@@ -251,22 +253,22 @@ export default function ImageStudioPage() {
                     {prompt.length} символа
                   </div>
                 </div>
-                {selectedModel.params.find((p) => p.key === 'prompt')?.description && (
-                  <p className="text-xs text-zinc-500">
-                    {selectedModel.params.find((p) => p.key === 'prompt')?.description}
-                  </p>
+                {promptDescription && (
+                  <p className="text-xs text-zinc-500">{promptDescription}</p>
                 )}
               </div>
 
-              {/* Parameters */}
-              <div className="p-5 rounded-xl bg-surface-500 border border-white/5 space-y-5">
-                <h3 className="text-sm font-semibold text-zinc-300">Настройки</h3>
-                <ParameterControls
-                  params={selectedModel.params}
-                  values={paramValues}
-                  onChange={handleParamChange}
-                />
-              </div>
+              {/* Dynamic Parameters from schema */}
+              {selectedModel.inputSchema && (
+                <div className="p-5 rounded-xl bg-surface-500 border border-white/5 space-y-5">
+                  <h3 className="text-sm font-semibold text-zinc-300">Настройки</h3>
+                  <DynamicParameterControls
+                    schema={selectedModel.inputSchema}
+                    values={paramValues}
+                    onChange={handleParamChange}
+                  />
+                </div>
+              )}
 
               {/* Generate button */}
               <button
@@ -282,7 +284,7 @@ export default function ImageStudioPage() {
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4" />
-                    {hasEditingCapability && paramValues.image
+                    {hasEditingCapability && hasAnyImageParam
                       ? 'Редактирай изображение'
                       : 'Генерирай изображение'}
                   </>
@@ -292,7 +294,7 @@ export default function ImageStudioPage() {
           )}
         </div>
 
-        {/* Right: Results as a masonry-like grid */}
+        {/* Right: Results */}
         <div className="space-y-4">
           <h2 className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
             Резултати

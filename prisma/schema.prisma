@@ -70,6 +70,30 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
+// ============== AI MODELS (cached from Replicate API) ==============
+
+model ReplicateModel {
+  id             String    @id @default(cuid())
+  replicateId    String    @unique        // e.g. "google/veo-3"
+  name           String                   // display name, e.g. "Veo 3"
+  provider       String                   // e.g. "Google"
+  providerColor  String    @default("#888888")
+  description    String    @default("")   // Bulgarian description
+  category       String                   // "video" | "image"
+  capabilities   String    @default("[]") // JSON array: ["text-to-video"]
+  badge          String?                  // optional badge text
+  inputSchema    String    @default("{}") // Full OpenAPI input schema from Replicate (JSON)
+  isActive       Boolean   @default(true)
+  lastSyncedAt   DateTime?
+  sortOrder      Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([category])
+  @@index([isActive, category])
+  @@map("replicate_models")
+}
+
 // ============== APP MODELS ==============
 
 model Generation {

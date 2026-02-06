@@ -146,6 +146,26 @@ function ParameterField({ param, value, onChange }: ParameterFieldProps) {
         </div>
       );
 
+    case 'textarea':
+      return (
+        <div className="space-y-2">
+          <label className="flex items-center gap-1.5 text-sm font-medium text-zinc-300">
+            {param.label}
+            {param.required && <span className="text-brand-400">*</span>}
+          </label>
+          {param.description && (
+            <p className="text-xs text-zinc-500">{param.description}</p>
+          )}
+          <textarea
+            value={value ?? ''}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={param.placeholder}
+            rows={3}
+            className="w-full px-3 py-2 rounded-lg bg-surface-400 border border-white/5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/30 transition-all leading-relaxed"
+          />
+        </div>
+      );
+
     case 'image':
       return (
         <ImageUploader

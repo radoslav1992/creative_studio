@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Video,
@@ -13,7 +14,7 @@ import {
   Users,
   Layers,
 } from 'lucide-react';
-import { videoModels, imageModels } from '@/lib/models';
+import { DynamicModel } from '@/lib/types';
 
 const features = [
   {
@@ -61,19 +62,34 @@ const features = [
 ];
 
 export default function HomePage() {
+  const [videoModels, setVideoModels] = useState<DynamicModel[]>([]);
+  const [imageModels, setImageModels] = useState<DynamicModel[]>([]);
+
+  useEffect(() => {
+    fetch('/api/models')
+      .then((r) => r.json())
+      .then((data: DynamicModel[]) => {
+        setVideoModels(data.filter((m) => m.category === 'video'));
+        setImageModels(data.filter((m) => m.category === 'image'));
+      })
+      .catch(() => {
+        // Models not synced yet — show empty
+      });
+  }, []);
+
+  const totalModels = videoModels.length + imageModels.length;
+
   return (
     <div className="min-h-screen">
       {/* Hero */}
       <div className="relative overflow-hidden">
-        {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-b from-brand-900/30 via-surface-700 to-surface-700" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-brand-500/10 rounded-full blur-[120px]" />
 
         <div className="relative max-w-[1200px] mx-auto px-6 pt-20 pb-16 text-center">
-          {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300 text-xs font-medium mb-8">
             <Sparkles className="w-3.5 h-3.5" />
-            Задвижвано от {videoModels.length + imageModels.length} AI модела
+            Задвижвано от {totalModels > 0 ? totalModels : '21'} AI модела
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
@@ -87,7 +103,6 @@ export default function HomePage() {
             Veo, Sora, Kling, Imagen, GPT Image, Ideogram — всичко на едно място.
           </p>
 
-          {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/studio/video"
@@ -133,90 +148,92 @@ export default function HomePage() {
       </div>
 
       {/* Models Overview */}
-      <div className="max-w-[1200px] mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Video Models */}
-          <div className="p-6 rounded-xl bg-surface-500 border border-white/5">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                <Video className="w-5 h-5 text-blue-400" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-white">Видео Модели</h3>
-                <p className="text-xs text-zinc-500">{videoModels.length} модела</p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              {videoModels.map((model) => (
-                <div
-                  key={model.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-surface-400 border border-white/5"
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: model.providerColor }}
-                    />
-                    <span className="text-sm text-zinc-300">{model.name}</span>
-                  </div>
-                  <span className="text-[10px] text-zinc-600">{model.provider}</span>
+      {(videoModels.length > 0 || imageModels.length > 0) && (
+        <div className="max-w-[1200px] mx-auto px-6 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Video Models */}
+            <div className="p-6 rounded-xl bg-surface-500 border border-white/5">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                  <Video className="w-5 h-5 text-blue-400" />
                 </div>
-              ))}
-            </div>
-            <Link
-              href="/studio/video"
-              className="flex items-center gap-2 mt-4 text-sm text-brand-400 hover:text-brand-300 transition-colors"
-            >
-              Отвори Видео Студио
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          {/* Image Models */}
-          <div className="p-6 rounded-xl bg-surface-500 border border-white/5">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                <Image className="w-5 h-5 text-emerald-400" />
+                <div>
+                  <h3 className="text-sm font-bold text-white">Видео Модели</h3>
+                  <p className="text-xs text-zinc-500">{videoModels.length} модела</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-white">Изображения Модели</h3>
-                <p className="text-xs text-zinc-500">{imageModels.length} модела</p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              {imageModels.map((model) => (
-                <div
-                  key={model.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-surface-400 border border-white/5"
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: model.providerColor }}
-                    />
-                    <span className="text-sm text-zinc-300">{model.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {model.capabilities.includes('image-editing') && (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400">
-                        Редактиране
-                      </span>
-                    )}
+              <div className="space-y-2">
+                {videoModels.map((model) => (
+                  <div
+                    key={model.id}
+                    className="flex items-center justify-between p-3 rounded-lg bg-surface-400 border border-white/5"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: model.providerColor }}
+                      />
+                      <span className="text-sm text-zinc-300">{model.name}</span>
+                    </div>
                     <span className="text-[10px] text-zinc-600">{model.provider}</span>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              <Link
+                href="/studio/video"
+                className="flex items-center gap-2 mt-4 text-sm text-brand-400 hover:text-brand-300 transition-colors"
+              >
+                Отвори Видео Студио
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
-            <Link
-              href="/studio/image"
-              className="flex items-center gap-2 mt-4 text-sm text-brand-400 hover:text-brand-300 transition-colors"
-            >
-              Отвори Изображения Студио
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+
+            {/* Image Models */}
+            <div className="p-6 rounded-xl bg-surface-500 border border-white/5">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                  <Image className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">Изображения Модели</h3>
+                  <p className="text-xs text-zinc-500">{imageModels.length} модела</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {imageModels.map((model) => (
+                  <div
+                    key={model.id}
+                    className="flex items-center justify-between p-3 rounded-lg bg-surface-400 border border-white/5"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: model.providerColor }}
+                      />
+                      <span className="text-sm text-zinc-300">{model.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {model.capabilities.includes('image-editing') && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400">
+                          Редактиране
+                        </span>
+                      )}
+                      <span className="text-[10px] text-zinc-600">{model.provider}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Link
+                href="/studio/image"
+                className="flex items-center gap-2 mt-4 text-sm text-brand-400 hover:text-brand-300 transition-colors"
+              >
+                Отвори Изображения Студио
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Footer */}
       <footer className="border-t border-white/5 py-8">

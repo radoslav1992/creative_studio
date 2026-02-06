@@ -1,6 +1,52 @@
 export type ModelCategory = 'video' | 'image';
 export type ModelCapability = 'text-to-video' | 'image-to-video' | 'text-to-image' | 'image-editing' | 'character-consistency';
 
+// ============== Dynamic model (from DB / API) ==============
+
+/**
+ * A single property from the Replicate OpenAPI schema.
+ * This is the raw schema — the UI renderer translates it to controls.
+ */
+export interface SchemaProperty {
+  type?: string;        // "string" | "integer" | "boolean" | "array" | "number"
+  enum?: (string | number)[];
+  default?: any;
+  description?: string;
+  minimum?: number;
+  maximum?: number;
+  format?: string;      // "uri" for image URLs
+  title?: string;
+  // For arrays
+  items?: { type?: string; format?: string };
+}
+
+/**
+ * The cached input schema for a model.
+ */
+export interface InputSchema {
+  properties: Record<string, SchemaProperty>;
+  required: string[];
+}
+
+/**
+ * A model as returned by /api/models — DB record with parsed JSON.
+ */
+export interface DynamicModel {
+  id: string;
+  replicateId: string;
+  name: string;
+  provider: string;
+  providerColor: string;
+  description: string;
+  category: ModelCategory;
+  capabilities: ModelCapability[];
+  badge?: string | null;
+  inputSchema: InputSchema;
+  lastSyncedAt?: string | null;
+}
+
+// ============== Legacy static model (kept for backward compat) ==============
+
 export interface ModelParam {
   key: string;
   label: string;
@@ -14,7 +60,6 @@ export interface ModelParam {
   max?: number;
   step?: number;
   maxImages?: number;
-  /** When true, select string values that look numeric will be sent as integers to the API */
   sendAsNumber?: boolean;
 }
 
@@ -30,6 +75,8 @@ export interface ModelConfig {
   params: ModelParam[];
   badge?: string;
 }
+
+// ============== Generations ==============
 
 export interface Generation {
   id: string;
