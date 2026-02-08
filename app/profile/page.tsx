@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { User, Mail, Calendar, BarChart3, Video, Image as ImageIcon, Shield } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
+import { User, Mail, BarChart3, Video, Image as ImageIcon, Shield, CheckCircle2, LogOut } from 'lucide-react';
 import { StudioLayout } from '@/components/StudioLayout';
 import { useStore } from '@/lib/store';
 
@@ -49,36 +49,38 @@ export default function ProfilePage() {
     <StudioLayout
       title="Профил"
       subtitle="Управлявайте вашия акаунт и настройки"
-      icon={<User className="w-5 h-5 text-brand-400" />}
+      icon={<User className="w-5 h-5 text-brand-600" />}
     >
       <div className="max-w-3xl mx-auto space-y-8">
         {/* User Info Card */}
-        <div className="p-8 rounded-2xl bg-surface-500 border border-white/5">
+        <div className="p-8 rounded-2xl bg-white border-2 border-ink shadow-brutal">
           <div className="flex items-center gap-6">
             {/* Avatar */}
             {session?.user?.image ? (
               <img
                 src={session.user.image}
                 alt={session.user.name || 'Потребител'}
-                className="w-20 h-20 rounded-2xl"
+                className="w-20 h-20 rounded-2xl border-2 border-ink shadow-brutal-sm"
               />
             ) : (
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
-                <span className="text-2xl font-bold text-white">{userInitial}</span>
+              <div className="w-20 h-20 rounded-2xl bg-brand-500 border-2 border-ink shadow-brutal-sm flex items-center justify-center">
+                <span className="text-2xl font-black text-white">{userInitial}</span>
               </div>
             )}
 
             <div className="space-y-2">
-              <h2 className="text-xl font-bold text-white">
+              <h2 className="text-xl font-black text-ink">
                 {session?.user?.name || 'Потребител'}
               </h2>
-              <div className="flex items-center gap-2 text-sm text-zinc-400">
-                <Mail className="w-4 h-4 text-zinc-500" />
+              <div className="flex items-center gap-2 text-sm font-medium text-ink-muted">
+                <Mail className="w-4 h-4 text-ink-faint" />
                 {session?.user?.email}
               </div>
-              <div className="flex items-center gap-2 text-xs text-zinc-500">
-                <Shield className="w-3.5 h-3.5" />
-                Активен акаунт
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1.5 text-xs font-bold text-mint-500 bg-mint-100 px-2.5 py-1 rounded-lg border-2 border-ink">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Активен акаунт
+                </span>
               </div>
             </div>
           </div>
@@ -86,80 +88,65 @@ export default function ProfilePage() {
 
         {/* Stats */}
         <div>
-          <h3 className="text-sm font-semibold text-zinc-300 mb-4 flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-brand-400" />
+          <h3 className="text-sm font-extrabold text-ink mb-4 flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-brand-500" />
             Статистика
           </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-            <div className="p-4 rounded-xl bg-surface-500 border border-white/5 text-center">
-              <div className="text-2xl font-bold text-white">{stats.total}</div>
-              <div className="text-xs text-zinc-500 mt-1">Общо</div>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            <div className="p-4 rounded-xl bg-white border-2 border-ink shadow-brutal-sm text-center">
+              <div className="text-2xl font-black text-ink">{stats.total}</div>
+              <div className="text-xs font-bold text-ink-muted mt-1">Общо</div>
             </div>
-            <div className="p-4 rounded-xl bg-surface-500 border border-white/5 text-center">
-              <div className="text-2xl font-bold text-blue-400">{stats.video}</div>
-              <div className="text-xs text-zinc-500 mt-1 flex items-center justify-center gap-1">
+            <div className="p-4 rounded-xl bg-sky-100 border-2 border-ink shadow-brutal-sm text-center">
+              <div className="text-2xl font-black text-ink">{stats.video}</div>
+              <div className="text-xs font-bold text-ink-muted mt-1 flex items-center justify-center gap-1">
                 <Video className="w-3 h-3" /> Видео
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-surface-500 border border-white/5 text-center">
-              <div className="text-2xl font-bold text-emerald-400">{stats.image}</div>
-              <div className="text-xs text-zinc-500 mt-1 flex items-center justify-center gap-1">
+            <div className="p-4 rounded-xl bg-mint-100 border-2 border-ink shadow-brutal-sm text-center">
+              <div className="text-2xl font-black text-ink">{stats.image}</div>
+              <div className="text-xs font-bold text-ink-muted mt-1 flex items-center justify-center gap-1">
                 <ImageIcon className="w-3 h-3" /> Изображения
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-surface-500 border border-white/5 text-center">
-              <div className="text-2xl font-bold text-green-400">{stats.succeeded}</div>
-              <div className="text-xs text-zinc-500 mt-1">Успешни</div>
+            <div className="p-4 rounded-xl bg-white border-2 border-ink shadow-brutal-sm text-center">
+              <div className="text-2xl font-black text-mint-500">{stats.succeeded}</div>
+              <div className="text-xs font-bold text-ink-muted mt-1">Успешни</div>
             </div>
-            <div className="p-4 rounded-xl bg-surface-500 border border-white/5 text-center">
-              <div className="text-2xl font-bold text-red-400">{stats.failed}</div>
-              <div className="text-xs text-zinc-500 mt-1">Неуспешни</div>
+            <div className="p-4 rounded-xl bg-white border-2 border-ink shadow-brutal-sm text-center">
+              <div className="text-2xl font-black text-peach-500">{stats.failed}</div>
+              <div className="text-xs font-bold text-ink-muted mt-1">Неуспешни</div>
             </div>
           </div>
         </div>
 
         {/* Account Info */}
         <div>
-          <h3 className="text-sm font-semibold text-zinc-300 mb-4 flex items-center gap-2">
-            <Shield className="w-4 h-4 text-brand-400" />
+          <h3 className="text-sm font-extrabold text-ink mb-4 flex items-center gap-2">
+            <Shield className="w-4 h-4 text-brand-500" />
             Информация за акаунта
           </h3>
-          <div className="p-6 rounded-xl bg-surface-500 border border-white/5 space-y-4">
-            <div className="flex items-center justify-between py-3 border-b border-white/5">
-              <div className="text-sm text-zinc-400">Име</div>
-              <div className="text-sm text-white font-medium">{session?.user?.name || '—'}</div>
+          <div className="p-6 rounded-xl bg-white border-2 border-ink shadow-brutal-sm space-y-0">
+            <div className="flex items-center justify-between py-4 border-b-2 border-ink/10">
+              <div className="text-sm font-bold text-ink-muted">Име</div>
+              <div className="text-sm font-bold text-ink">{session?.user?.name || '—'}</div>
             </div>
-            <div className="flex items-center justify-between py-3 border-b border-white/5">
-              <div className="text-sm text-zinc-400">Имейл</div>
-              <div className="text-sm text-white font-medium">{session?.user?.email}</div>
-            </div>
-            <div className="flex items-center justify-between py-3">
-              <div className="text-sm text-zinc-400">ID</div>
-              <div className="text-xs text-zinc-500 font-mono">{session?.user?.id}</div>
+            <div className="flex items-center justify-between py-4">
+              <div className="text-sm font-bold text-ink-muted">Имейл</div>
+              <div className="text-sm font-bold text-ink">{session?.user?.email}</div>
             </div>
           </div>
         </div>
 
-        {/* Environment Info */}
+        {/* Sign Out */}
         <div>
-          <h3 className="text-sm font-semibold text-zinc-300 mb-4 flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-brand-400" />
-            Конфигурация
-          </h3>
-          <div className="p-6 rounded-xl bg-surface-500 border border-white/5 space-y-4">
-            <div className="flex items-center justify-between py-3 border-b border-white/5">
-              <div className="text-sm text-zinc-400">База данни</div>
-              <div className="text-sm text-emerald-400 font-medium">SQLite (Prisma)</div>
-            </div>
-            <div className="flex items-center justify-between py-3 border-b border-white/5">
-              <div className="text-sm text-zinc-400">Автентикация</div>
-              <div className="text-sm text-emerald-400 font-medium">NextAuth.js</div>
-            </div>
-            <div className="flex items-center justify-between py-3">
-              <div className="text-sm text-zinc-400">AI API</div>
-              <div className="text-sm text-emerald-400 font-medium">Replicate</div>
-            </div>
-          </div>
+          <button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="nb-btn flex items-center gap-2 px-5 py-2.5 rounded-xl bg-peach-100 border-2 border-ink text-ink text-sm font-bold hover:bg-peach-200 transition-all shadow-brutal-sm"
+          >
+            <LogOut className="w-4 h-4" />
+            Излизане от акаунта
+          </button>
         </div>
       </div>
     </StudioLayout>
