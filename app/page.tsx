@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import {
   Video,
   Image,
@@ -13,8 +14,11 @@ import {
   Pencil,
   Users,
   Layers,
+  LogIn,
+  UserPlus,
 } from 'lucide-react';
 import { DynamicModel } from '@/lib/types';
+import { Dashboard } from '@/components/Dashboard';
 
 const features = [
   {
@@ -61,7 +65,7 @@ const features = [
   },
 ];
 
-export default function HomePage() {
+function LandingPage() {
   const [videoModels, setVideoModels] = useState<DynamicModel[]>([]);
   const [imageModels, setImageModels] = useState<DynamicModel[]>([]);
 
@@ -72,9 +76,7 @@ export default function HomePage() {
         setVideoModels(data.filter((m) => m.category === 'video'));
         setImageModels(data.filter((m) => m.category === 'image'));
       })
-      .catch(() => {
-        // Models not synced yet — show empty
-      });
+      .catch(() => {});
   }, []);
 
   const totalModels = videoModels.length + imageModels.length;
@@ -105,19 +107,19 @@ export default function HomePage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/studio/video"
+              href="/auth/register"
               className="group flex items-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 text-white font-semibold shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40 transition-all"
             >
-              <Video className="w-5 h-5" />
-              Видео Студио
+              <UserPlus className="w-5 h-5" />
+              Регистрирайте се
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
-              href="/studio/image"
+              href="/auth/login"
               className="group flex items-center gap-3 px-8 py-4 rounded-xl bg-white/5 border border-white/10 text-white font-semibold hover:bg-white/10 hover:border-white/20 transition-all"
             >
-              <Image className="w-5 h-5" />
-              Изображения Студио
+              <LogIn className="w-5 h-5" />
+              Влезте в акаунта си
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -169,10 +171,7 @@ export default function HomePage() {
                     className="flex items-center justify-between p-3 rounded-lg bg-surface-400 border border-white/5"
                   >
                     <div className="flex items-center gap-3">
-                      <div
-                        className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: model.providerColor }}
-                      />
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: model.providerColor }} />
                       <span className="text-sm text-zinc-300">{model.name}</span>
                     </div>
                     <span className="text-[10px] text-zinc-600">{model.provider}</span>
@@ -180,10 +179,10 @@ export default function HomePage() {
                 ))}
               </div>
               <Link
-                href="/studio/video"
+                href="/auth/login"
                 className="flex items-center gap-2 mt-4 text-sm text-brand-400 hover:text-brand-300 transition-colors"
               >
-                Отвори Видео Студио
+                Влезте за Видео Студио
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -206,10 +205,7 @@ export default function HomePage() {
                     className="flex items-center justify-between p-3 rounded-lg bg-surface-400 border border-white/5"
                   >
                     <div className="flex items-center gap-3">
-                      <div
-                        className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: model.providerColor }}
-                      />
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: model.providerColor }} />
                       <span className="text-sm text-zinc-300">{model.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -224,10 +220,10 @@ export default function HomePage() {
                 ))}
               </div>
               <Link
-                href="/studio/image"
+                href="/auth/login"
                 className="flex items-center gap-2 mt-4 text-sm text-brand-400 hover:text-brand-300 transition-colors"
               >
-                Отвори Изображения Студио
+                Влезте за Изображения Студио
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -249,4 +245,14 @@ export default function HomePage() {
       </footer>
     </div>
   );
+}
+
+export default function HomePage() {
+  const { status } = useSession();
+
+  if (status === 'authenticated') {
+    return <Dashboard />;
+  }
+
+  return <LandingPage />;
 }

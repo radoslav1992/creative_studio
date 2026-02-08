@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { MODEL_REGISTRY } from '@/lib/model-registry';
+import { requireAdmin } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,18 +46,13 @@ function resolveSchema(
  * resolves $ref/allOf references, and stores the result in the DB.
  */
 export async function POST(request: Request) {
-  // Simple auth check — require the REPLICATE_API_TOKEN as bearer
-  const authHeader = request.headers.get('authorization');
+  const auth = await requireAdmin();
+  if (!auth.authorized) return auth.response;
+
   const token = process.env.REPLICATE_API_TOKEN;
 
   if (!token) {
     return NextResponse.json({ error: 'REPLICATE_API_TOKEN not configured' }, { status: 500 });
-  }
-
-  // Allow the sync to run if the request comes from the same server (no auth header needed in dev)
-  // or if the correct token is provided
-  if (authHeader && authHeader !== `Bearer ${token}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const results: { replicateId: string; status: string; error?: string }[] = [];

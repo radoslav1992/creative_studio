@@ -7,3 +7,6 @@ out/
 # Prisma
 *.db
 *.db-journal
+
+# Generated outputs
+public/outputs/

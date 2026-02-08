@@ -1,13 +1,17 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Sidebar } from '@/components/Sidebar';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { status } = useSession();
   const isAuthPage = pathname.startsWith('/auth');
+  const isAuthenticated = status === 'authenticated';
 
-  if (isAuthPage) {
+  // No sidebar on auth pages or for logged-out users
+  if (isAuthPage || !isAuthenticated) {
     return <>{children}</>;
   }
 

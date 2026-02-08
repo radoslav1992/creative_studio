@@ -15,29 +15,45 @@ import {
   User,
   LogOut,
   Settings,
+  Shield,
 } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
   {
     href: '/',
-    label: 'Начало',
+    label: 'Табло',
     icon: Home,
+    requiresAuth: false,
+    adminOnly: false,
   },
   {
     href: '/studio/video',
     label: 'Видео Студио',
     icon: Video,
+    requiresAuth: true,
+    adminOnly: false,
   },
   {
     href: '/studio/image',
     label: 'Изображения Студио',
     icon: Image,
+    requiresAuth: true,
+    adminOnly: false,
   },
   {
     href: '/gallery',
     label: 'Галерия',
     icon: LayoutGrid,
+    requiresAuth: true,
+    adminOnly: false,
+  },
+  {
+    href: '/admin/models',
+    label: 'Админ панел',
+    icon: Shield,
+    requiresAuth: true,
+    adminOnly: true,
   },
 ];
 
@@ -48,9 +64,16 @@ export function Sidebar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const isAuthenticated = status === 'authenticated';
+  const isAdmin = (session?.user as any)?.role === 'admin';
   const userInitial = session?.user?.name?.charAt(0)?.toUpperCase()
     || session?.user?.email?.charAt(0)?.toUpperCase()
     || 'U';
+
+  const visibleNavItems = navItems.filter((item) => {
+    if (item.adminOnly && !isAdmin) return false;
+    if (item.requiresAuth && !isAuthenticated) return false;
+    return true;
+  });
 
   return (
     <aside
@@ -78,7 +101,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive =
             item.href === '/'
               ? pathname === '/'

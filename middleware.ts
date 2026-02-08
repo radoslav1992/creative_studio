@@ -11,10 +11,12 @@ export const config = {
     '/studio/:path*',
     '/gallery/:path*',
     '/profile/:path*',
+    '/admin/:path*',
     '/api/generate/:path*',
     '/api/generations/:path*',
     '/api/enhance-prompt/:path*',
-    // NOTE: /api/models and /api/admin/* are intentionally NOT protected
-    // so the home page can load models without auth, and sync can run freely.
+    '/api/admin/:path*',
+    // NOTE: /api/models is intentionally NOT protected
+    // so the home page can load models without auth.
   ],
 };
