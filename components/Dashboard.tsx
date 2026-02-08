@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   XCircle,
   Loader2,
-  LayoutGrid,
   Plus,
   TrendingUp,
   Film,
@@ -34,22 +33,24 @@ function StatCard({
   icon,
   label,
   value,
-  color,
+  bgColor,
+  shadowColor,
 }: {
   icon: React.ReactNode;
   label: string;
   value: number;
-  color: string;
+  bgColor: string;
+  shadowColor: string;
 }) {
   return (
-    <div className="p-4 rounded-xl bg-surface-500 border border-white/5">
+    <div className={clsx('p-4 rounded-xl bg-white border-2 border-ink transition-all', shadowColor)}>
       <div className="flex items-center gap-3">
-        <div className={clsx('w-10 h-10 rounded-xl flex items-center justify-center', color)}>
+        <div className={clsx('w-10 h-10 rounded-xl flex items-center justify-center border-2 border-ink', bgColor)}>
           {icon}
         </div>
         <div>
-          <p className="text-2xl font-bold text-white">{value}</p>
-          <p className="text-xs text-zinc-500">{label}</p>
+          <p className="text-2xl font-extrabold text-ink">{value}</p>
+          <p className="text-xs font-bold text-ink-muted">{label}</p>
         </div>
       </div>
     </div>
@@ -65,14 +66,14 @@ function RecentGenerationCard({ gen }: { gen: Generation }) {
   const isProcessing = gen.status === 'starting' || gen.status === 'processing';
 
   return (
-    <div className="group relative rounded-xl border border-white/5 bg-surface-500 overflow-hidden hover:border-white/10 transition-all">
+    <div className="group relative rounded-xl border-2 border-ink bg-white overflow-hidden shadow-brutal-sm hover:shadow-brutal transition-all hover:-translate-y-0.5">
       {/* Thumbnail / Preview */}
-      <div className="aspect-video bg-surface-600 relative">
+      <div className="aspect-video bg-cream-200 relative">
         {isProcessing && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
-              <Loader2 className="w-8 h-8 text-brand-400 animate-spin" />
-              <span className="text-xs text-zinc-500">Обработка...</span>
+              <Loader2 className="w-8 h-8 text-brand-500 animate-spin" />
+              <span className="text-xs font-bold text-ink-muted">Обработка...</span>
             </div>
           </div>
         )}
@@ -95,7 +96,7 @@ function RecentGenerationCard({ gen }: { gen: Generation }) {
         )}
         {gen.status === 'failed' && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <XCircle className="w-8 h-8 text-red-400/50" />
+            <XCircle className="w-8 h-8 text-peach-500" />
           </div>
         )}
 
@@ -103,10 +104,10 @@ function RecentGenerationCard({ gen }: { gen: Generation }) {
         <div className="absolute top-2 left-2">
           <span
             className={clsx(
-              'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium backdrop-blur-sm',
+              'flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold border-2 border-ink',
               isVideo
-                ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                ? 'bg-sky-200 text-ink'
+                : 'bg-mint-200 text-ink'
             )}
           >
             {isVideo ? <Film className="w-3 h-3" /> : <Palette className="w-3 h-3" />}
@@ -117,17 +118,17 @@ function RecentGenerationCard({ gen }: { gen: Generation }) {
         {/* Status badge */}
         <div className="absolute top-2 right-2">
           {gen.status === 'succeeded' && (
-            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 backdrop-blur-sm">
+            <span className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold bg-mint-300 border-2 border-ink text-ink">
               <CheckCircle2 className="w-3 h-3" />
             </span>
           )}
           {isProcessing && (
-            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-brand-500/20 text-brand-300 border border-brand-500/30 backdrop-blur-sm animate-pulse">
+            <span className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold bg-sunny-200 border-2 border-ink text-ink animate-pulse">
               <Loader2 className="w-3 h-3 animate-spin" />
             </span>
           )}
           {gen.status === 'failed' && (
-            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-red-500/20 text-red-300 border border-red-500/30 backdrop-blur-sm">
+            <span className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold bg-peach-200 border-2 border-ink text-ink">
               <XCircle className="w-3 h-3" />
             </span>
           )}
@@ -135,11 +136,11 @@ function RecentGenerationCard({ gen }: { gen: Generation }) {
       </div>
 
       {/* Info */}
-      <div className="p-3 space-y-1.5">
-        <p className="text-sm text-zinc-300 line-clamp-2 leading-snug">{gen.prompt}</p>
+      <div className="p-3 space-y-1.5 border-t-2 border-ink">
+        <p className="text-sm font-bold text-ink line-clamp-2 leading-snug">{gen.prompt}</p>
         <div className="flex items-center justify-between">
-          <span className="text-[10px] text-zinc-600">{gen.modelName}</span>
-          <span className="flex items-center gap-1 text-[10px] text-zinc-600">
+          <span className="text-[10px] font-bold text-ink-muted">{gen.modelName}</span>
+          <span className="flex items-center gap-1 text-[10px] font-bold text-ink-faint">
             <Clock className="w-3 h-3" />
             {new Date(gen.createdAt).toLocaleDateString('bg-BG', { day: 'numeric', month: 'short' })}
           </span>
@@ -179,29 +180,29 @@ export function Dashboard() {
   const firstName = session?.user?.name?.split(' ')[0] || 'потребител';
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-cream-100">
       <div className="max-w-[1400px] mx-auto px-6 py-8 space-y-8">
         {/* Welcome header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-3xl font-extrabold text-ink">
               Здравейте, {firstName}
             </h1>
-            <p className="text-sm text-zinc-500 mt-1">
+            <p className="text-sm font-medium text-ink-muted mt-1">
               Ето какво се случва в студиото ви
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Link
               href="/studio/video"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 text-white text-sm font-medium hover:from-brand-500 hover:to-brand-400 transition-all shadow-lg shadow-brand-500/20"
+              className="nb-btn flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-500 border-2 border-ink text-white text-sm font-bold hover:bg-brand-600 transition-all shadow-brutal-sm"
             >
               <Plus className="w-4 h-4" />
               Ново видео
             </Link>
             <Link
               href="/studio/image"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-400 border border-white/5 text-zinc-300 text-sm font-medium hover:bg-surface-300 transition-colors"
+              className="nb-btn flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border-2 border-ink text-ink text-sm font-bold hover:bg-cream-200 transition-colors shadow-brutal-sm"
             >
               <Plus className="w-4 h-4" />
               Ново изображение
@@ -212,40 +213,46 @@ export function Dashboard() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
           <StatCard
-            icon={<TrendingUp className="w-5 h-5 text-brand-400" />}
+            icon={<TrendingUp className="w-5 h-5 text-brand-600" />}
             label="Общо генерации"
             value={stats.total}
-            color="bg-brand-500/10"
+            bgColor="bg-brand-100"
+            shadowColor="shadow-brutal-sm"
           />
           <StatCard
-            icon={<CheckCircle2 className="w-5 h-5 text-emerald-400" />}
+            icon={<CheckCircle2 className="w-5 h-5 text-mint-500" />}
             label="Успешни"
             value={stats.succeeded}
-            color="bg-emerald-500/10"
+            bgColor="bg-mint-100"
+            shadowColor="shadow-brutal-sm"
           />
           <StatCard
-            icon={<Loader2 className="w-5 h-5 text-blue-400" />}
+            icon={<Loader2 className="w-5 h-5 text-sky-500" />}
             label="В обработка"
             value={stats.processing}
-            color="bg-blue-500/10"
+            bgColor="bg-sky-100"
+            shadowColor="shadow-brutal-sm"
           />
           <StatCard
-            icon={<XCircle className="w-5 h-5 text-red-400" />}
+            icon={<XCircle className="w-5 h-5 text-peach-500" />}
             label="Неуспешни"
             value={stats.failed}
-            color="bg-red-500/10"
+            bgColor="bg-peach-100"
+            shadowColor="shadow-brutal-sm"
           />
           <StatCard
-            icon={<Video className="w-5 h-5 text-blue-400" />}
+            icon={<Video className="w-5 h-5 text-sky-500" />}
             label="Видеа"
             value={stats.videos}
-            color="bg-blue-500/10"
+            bgColor="bg-sky-100"
+            shadowColor="shadow-brutal-sm"
           />
           <StatCard
-            icon={<ImageIcon className="w-5 h-5 text-emerald-400" />}
+            icon={<ImageIcon className="w-5 h-5 text-mint-500" />}
             label="Изображения"
             value={stats.images}
-            color="bg-emerald-500/10"
+            bgColor="bg-mint-100"
+            shadowColor="shadow-brutal-sm"
           />
         </div>
 
@@ -253,48 +260,48 @@ export function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link
             href="/studio/video"
-            className="group flex items-center gap-4 p-5 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-700/5 border border-blue-500/10 hover:border-blue-500/20 transition-all"
+            className="group flex items-center gap-4 p-5 rounded-xl bg-sky-100 border-2 border-ink shadow-brutal-sm hover:shadow-brutal hover:-translate-y-0.5 transition-all"
           >
-            <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-              <Video className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 rounded-xl bg-sky-300 border-2 border-ink flex items-center justify-center flex-shrink-0 shadow-brutal-sm">
+              <Video className="w-6 h-6 text-ink" />
             </div>
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-white mb-0.5">Видео Студио</h3>
-              <p className="text-xs text-zinc-500">
+              <h3 className="text-sm font-extrabold text-ink mb-0.5">Видео Студио</h3>
+              <p className="text-xs font-medium text-ink-muted">
                 Създавайте видеа с Veo 3, Sora 2 Pro, Kling и други
               </p>
             </div>
-            <ArrowRight className="w-5 h-5 text-zinc-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+            <ArrowRight className="w-5 h-5 text-ink-muted group-hover:text-ink group-hover:translate-x-1 transition-all" />
           </Link>
 
           <Link
             href="/studio/image"
-            className="group flex items-center gap-4 p-5 rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-700/5 border border-emerald-500/10 hover:border-emerald-500/20 transition-all"
+            className="group flex items-center gap-4 p-5 rounded-xl bg-mint-100 border-2 border-ink shadow-brutal-sm hover:shadow-brutal hover:-translate-y-0.5 transition-all"
           >
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-              <ImageIcon className="w-6 h-6 text-emerald-400" />
+            <div className="w-12 h-12 rounded-xl bg-mint-300 border-2 border-ink flex items-center justify-center flex-shrink-0 shadow-brutal-sm">
+              <ImageIcon className="w-6 h-6 text-ink" />
             </div>
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-white mb-0.5">Изображения Студио</h3>
-              <p className="text-xs text-zinc-500">
+              <h3 className="text-sm font-extrabold text-ink mb-0.5">Изображения Студио</h3>
+              <p className="text-xs font-medium text-ink-muted">
                 Генерирайте с Imagen 4, GPT Image, Ideogram и други
               </p>
             </div>
-            <ArrowRight className="w-5 h-5 text-zinc-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+            <ArrowRight className="w-5 h-5 text-ink-muted group-hover:text-ink group-hover:translate-x-1 transition-all" />
           </Link>
         </div>
 
         {/* Recent generations */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-              <Clock className="w-5 h-5 text-zinc-500" />
+            <h2 className="text-lg font-extrabold text-ink flex items-center gap-2">
+              <Clock className="w-5 h-5 text-ink-muted" />
               Последни генерации
             </h2>
             {generations.length > 0 && (
               <Link
                 href="/gallery"
-                className="flex items-center gap-1.5 text-sm text-brand-400 hover:text-brand-300 transition-colors"
+                className="flex items-center gap-1.5 text-sm font-bold text-brand-600 hover:text-brand-700 transition-colors"
               >
                 Виж всички
                 <ArrowRight className="w-4 h-4" />
@@ -304,30 +311,30 @@ export function Dashboard() {
 
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 text-brand-400 animate-spin" />
+              <Loader2 className="w-8 h-8 text-brand-500 animate-spin" />
             </div>
           ) : generations.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-20 h-20 rounded-2xl bg-surface-500 border border-white/5 flex items-center justify-center mb-5">
-                <Sparkles className="w-9 h-9 text-zinc-700" />
+              <div className="w-20 h-20 rounded-2xl bg-white border-2 border-ink shadow-brutal flex items-center justify-center mb-5">
+                <Sparkles className="w-9 h-9 text-brand-400" />
               </div>
-              <h3 className="text-base font-semibold text-white mb-2">
+              <h3 className="text-base font-extrabold text-ink mb-2">
                 Все още няма генерации
               </h3>
-              <p className="text-sm text-zinc-500 max-w-sm mb-6">
+              <p className="text-sm font-medium text-ink-muted max-w-sm mb-6">
                 Създайте първото си видео или изображение с AI, за да го видите тук.
               </p>
               <div className="flex items-center gap-3">
                 <Link
                   href="/studio/video"
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 text-white text-sm font-medium hover:from-brand-500 hover:to-brand-400 transition-all"
+                  className="nb-btn flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-500 border-2 border-ink text-white text-sm font-bold shadow-brutal-sm transition-all"
                 >
                   <Video className="w-4 h-4" />
                   Създай видео
                 </Link>
                 <Link
                   href="/studio/image"
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-surface-400 border border-white/5 text-zinc-300 text-sm font-medium hover:bg-surface-300 transition-colors"
+                  className="nb-btn flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border-2 border-ink text-ink text-sm font-bold shadow-brutal-sm transition-all"
                 >
                   <ImageIcon className="w-4 h-4" />
                   Създай изображение

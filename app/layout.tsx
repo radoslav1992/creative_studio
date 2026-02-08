@@ -21,12 +21,15 @@ export default function RootLayout({
           <AppShell>{children}</AppShell>
           <Toaster
             position="bottom-right"
-            theme="dark"
+            theme="light"
             toastOptions={{
               style: {
-                background: '#1e2028',
-                border: '1px solid #2a2d35',
-                color: '#e4e4e7',
+                background: '#ffffff',
+                border: '2px solid #1a1a2e',
+                borderRadius: '12px',
+                color: '#1a1a2e',
+                boxShadow: '3px 3px 0px 0px #1a1a2e',
+                fontWeight: 500,
               },
             }}
           />

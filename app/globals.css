@@ -1,9 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --brand-gradient: linear-gradient(135deg, #6b24ff 0%, #8347ff 50%, #b794ff 100%);
+  --brand: #7c5cfc;
+  --ink: #1a1a2e;
+  --cream: #fef9f0;
 }
 
 * {
@@ -11,28 +15,29 @@
 }
 
 body {
-  background-color: #0c0e14;
-  color: #e4e4e7;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  background-color: #fef9f0;
+  color: #1a1a2e;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar — soft neubrutalism */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #14161d;
+  background: #fdf3e4;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2a2d35;
-  border-radius: 3px;
+  background: #d4c8ff;
+  border-radius: 4px;
+  border: 2px solid #fdf3e4;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a3d45;
+  background: #b5a0ff;
 }
 
 /* Animations */
@@ -41,9 +46,9 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(107, 36, 255, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(107, 36, 255, 0.6); }
+@keyframes bounce-shadow {
+  0%, 100% { box-shadow: 4px 4px 0px 0px #1a1a2e; }
+  50% { box-shadow: 2px 2px 0px 0px #1a1a2e; }
 }
 
 @keyframes shimmer {
@@ -55,12 +60,8 @@ body {
   animation: fadeIn 0.3s ease-out;
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
 .shimmer {
-  background: linear-gradient(90deg, #1e2028 25%, #2a2d35 50%, #1e2028 75%);
+  background: linear-gradient(90deg, #fdf3e4 25%, #fff 50%, #fdf3e4 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -72,35 +73,98 @@ textarea {
 
 /* Dropzone */
 .dropzone-active {
-  border-color: #6b24ff !important;
-  background-color: rgba(107, 36, 255, 0.1) !important;
+  border-color: #7c5cfc !important;
+  background-color: rgba(124, 92, 252, 0.08) !important;
+}
+
+/* Neubrutalism card base styles */
+.nb-card {
+  background: white;
+  border: 2px solid #1a1a2e;
+  border-radius: 16px;
+  box-shadow: 4px 4px 0px 0px #1a1a2e;
+  transition: all 0.15s ease;
+}
+
+.nb-card:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0px 0px #1a1a2e;
+}
+
+.nb-card.selected {
+  border-color: #7c5cfc;
+  box-shadow: 4px 4px 0px 0px #7c5cfc;
 }
 
 /* Model card hover */
 .model-card {
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .model-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #1a1a2e;
 }
 
 .model-card.selected {
-  border-color: #6b24ff;
-  box-shadow: 0 0 0 1px #6b24ff, 0 8px 25px rgba(107, 36, 255, 0.2);
+  border-color: #7c5cfc;
+  box-shadow: 4px 4px 0px 0px #7c5cfc;
 }
 
 /* Generation result card */
 .result-card {
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .result-card:hover {
-  transform: scale(1.02);
+  transform: translate(-1px, -1px);
+}
+
+/* Button press effect */
+.nb-btn {
+  transition: all 0.1s ease;
+}
+
+.nb-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px #1a1a2e !important;
 }
 
 /* Toast styles override */
 [data-sonner-toaster] {
   font-family: inherit !important;
+}
+
+/* Range slider neubrutalism */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  background: #fdf3e4;
+  border: 2px solid #1a1a2e;
+  border-radius: 4px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #7c5cfc;
+  border: 2px solid #1a1a2e;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px 0px #1a1a2e;
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  box-shadow: 0px 0px 0px 0px #1a1a2e;
+  transform: scale(0.95);
+}
+
+/* Toggle switch neubrutalism */
+.nb-toggle {
+  border: 2px solid #1a1a2e;
+  box-shadow: 2px 2px 0px 0px #1a1a2e;
 }

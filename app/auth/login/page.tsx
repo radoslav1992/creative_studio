@@ -43,53 +43,54 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      {/* Background effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-brand-900/20 via-surface-700 to-surface-700" />
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-brand-500/5 rounded-full blur-[120px]" />
+    <div className="min-h-screen flex items-center justify-center px-4 bg-cream-100 relative">
+      {/* Decorative shapes */}
+      <div className="absolute top-20 left-20 w-24 h-24 bg-brand-200 rounded-full border-2 border-ink opacity-20" />
+      <div className="absolute bottom-20 right-20 w-16 h-16 bg-sunny-300 rounded-xl border-2 border-ink opacity-20 rotate-12" />
+      <div className="absolute top-1/3 right-1/4 w-12 h-12 bg-mint-300 rounded-full border-2 border-ink opacity-15" />
 
       <div className="relative w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-500 border-2 border-ink shadow-brutal mb-4">
             <Sparkles className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Добре дошли обратно</h1>
-          <p className="text-sm text-zinc-500">Влезте в Креатив Студио</p>
+          <h1 className="text-2xl font-black text-ink mb-2">Добре дошли обратно</h1>
+          <p className="text-sm font-bold text-ink-muted">Влезте в Креатив Студио</p>
         </div>
 
         {/* Card */}
-        <div className="p-8 rounded-2xl bg-surface-500 border border-white/5 shadow-2xl">
+        <div className="p-8 rounded-2xl bg-white border-2 border-ink shadow-brutal">
           {/* Error */}
           {error && (
-            <div className="flex items-center gap-2 p-3 mb-6 rounded-xl bg-red-500/10 border border-red-500/20">
-              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-              <p className="text-sm text-red-400">{error}</p>
+            <div className="flex items-center gap-2 p-3 mb-6 rounded-xl bg-peach-100 border-2 border-ink">
+              <AlertCircle className="w-4 h-4 text-peach-500 flex-shrink-0" />
+              <p className="text-sm font-bold text-ink">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">Имейл</label>
+              <label className="text-sm font-bold text-ink">Имейл</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-400 border border-white/5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/30 transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-cream-100 border-2 border-ink text-sm font-medium text-ink placeholder:text-ink-faint focus:outline-none focus:border-brand-500 focus:shadow-brutal-brand-sm transition-all"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">Парола</label>
+              <label className="text-sm font-bold text-ink">Парола</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" />
                 <input
                   type="password"
                   value={password}
@@ -97,7 +98,7 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   required
                   minLength={6}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-400 border border-white/5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/30 transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-cream-100 border-2 border-ink text-sm font-medium text-ink placeholder:text-ink-faint focus:outline-none focus:border-brand-500 focus:shadow-brutal-brand-sm transition-all"
                 />
               </div>
             </div>
@@ -106,7 +107,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 text-white font-semibold text-sm hover:from-brand-500 hover:to-brand-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40 flex items-center justify-center gap-2"
+              className="nb-btn w-full py-3 rounded-xl bg-brand-500 border-2 border-ink text-white font-bold text-sm hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-brutal-sm flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>
@@ -125,28 +126,28 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/5" />
+              <div className="w-full border-t-2 border-ink/10" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-3 bg-surface-500 text-zinc-600">или</span>
+              <span className="px-3 bg-white text-ink-muted font-bold">или</span>
             </div>
           </div>
 
           {/* GitHub */}
           <button
             onClick={handleGitHubLogin}
-            className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white font-medium text-sm hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-center gap-2"
+            className="nb-btn w-full py-3 rounded-xl bg-white border-2 border-ink text-ink font-bold text-sm hover:bg-cream-100 transition-all shadow-brutal-sm flex items-center justify-center gap-2"
           >
             <Github className="w-4 h-4" />
             Продължете с GitHub
           </button>
 
           {/* Register link */}
-          <p className="text-center text-sm text-zinc-500 mt-6">
+          <p className="text-center text-sm font-medium text-ink-muted mt-6">
             Нямате акаунт?{' '}
             <Link
               href="/auth/register"
-              className="text-brand-400 hover:text-brand-300 font-medium transition-colors"
+              className="text-brand-600 hover:text-brand-700 font-bold transition-colors"
             >
               Регистрирайте се
             </Link>

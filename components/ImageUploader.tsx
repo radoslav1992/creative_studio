@@ -48,16 +48,16 @@ export function ImageUploader({
 
   return (
     <div className="space-y-2">
-      <label className="flex items-center gap-1.5 text-sm font-medium text-zinc-300">
+      <label className="flex items-center gap-1.5 text-sm font-bold text-ink">
         {label}
-        {required && <span className="text-brand-400">*</span>}
+        {required && <span className="text-brand-500">*</span>}
       </label>
       {description && (
-        <p className="text-xs text-zinc-500">{description}</p>
+        <p className="text-xs font-medium text-ink-muted">{description}</p>
       )}
 
       {value ? (
-        <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-surface-400">
+        <div className="relative group rounded-xl overflow-hidden border-2 border-ink bg-white shadow-brutal-sm">
           <img
             src={value}
             alt="Качено изображение"
@@ -68,7 +68,7 @@ export function ImageUploader({
               e.stopPropagation();
               onChange(null);
             }}
-            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500"
+            className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-white border-2 border-ink flex items-center justify-center text-ink opacity-0 group-hover:opacity-100 transition-opacity hover:bg-peach-100 hover:text-peach-500 shadow-brutal-sm"
           >
             <X className="w-4 h-4" />
           </button>
@@ -79,24 +79,24 @@ export function ImageUploader({
           className={clsx(
             'flex flex-col items-center justify-center p-6 rounded-xl border-2 border-dashed cursor-pointer transition-all',
             isDragging
-              ? 'border-brand-500 bg-brand-500/10'
-              : 'border-white/10 bg-surface-400 hover:border-white/20 hover:bg-surface-300'
+              ? 'border-brand-500 bg-brand-50'
+              : 'border-ink/30 bg-cream-100 hover:border-ink hover:bg-cream-200'
           )}
         >
           <input {...getInputProps()} />
-          <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center mb-3">
+          <div className="w-10 h-10 rounded-xl bg-white border-2 border-ink flex items-center justify-center mb-3 shadow-brutal-sm">
             {isDragging ? (
-              <Upload className="w-5 h-5 text-brand-400" />
+              <Upload className="w-5 h-5 text-brand-500" />
             ) : (
-              <ImageIcon className="w-5 h-5 text-zinc-500" />
+              <ImageIcon className="w-5 h-5 text-ink-muted" />
             )}
           </div>
-          <p className="text-sm text-zinc-400 text-center">
+          <p className="text-sm font-bold text-ink-muted text-center">
             {isDragging
               ? 'Пуснете тук...'
               : 'Плъзнете или щракнете за качване'}
           </p>
-          <p className="text-xs text-zinc-600 mt-1">PNG, JPG, WEBP</p>
+          <p className="text-xs font-medium text-ink-faint mt-1">PNG, JPG, WEBP</p>
         </div>
       )}
     </div>
@@ -153,11 +153,11 @@ export function MultiImageUploader({
 
   return (
     <div className="space-y-2">
-      <label className="flex items-center gap-1.5 text-sm font-medium text-zinc-300">
+      <label className="flex items-center gap-1.5 text-sm font-bold text-ink">
         {label}
       </label>
       {description && (
-        <p className="text-xs text-zinc-500">{description}</p>
+        <p className="text-xs font-medium text-ink-muted">{description}</p>
       )}
 
       {/* Existing images */}
@@ -166,7 +166,7 @@ export function MultiImageUploader({
           {values.map((url, i) => (
             <div
               key={i}
-              className="relative group w-24 h-24 rounded-lg overflow-hidden border border-white/10"
+              className="relative group w-24 h-24 rounded-xl overflow-hidden border-2 border-ink shadow-brutal-sm"
             >
               <img
                 src={url}
@@ -175,7 +175,7 @@ export function MultiImageUploader({
               />
               <button
                 onClick={() => removeImage(i)}
-                className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500"
+                className="absolute top-1 right-1 w-5 h-5 rounded-lg bg-white border border-ink flex items-center justify-center text-ink opacity-0 group-hover:opacity-100 transition-opacity hover:bg-peach-100"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -191,13 +191,13 @@ export function MultiImageUploader({
           className={clsx(
             'flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed cursor-pointer transition-all',
             isDragging
-              ? 'border-brand-500 bg-brand-500/10'
-              : 'border-white/10 bg-surface-400 hover:border-white/20'
+              ? 'border-brand-500 bg-brand-50'
+              : 'border-ink/30 bg-cream-100 hover:border-ink'
           )}
         >
           <input {...getInputProps()} />
-          <Upload className="w-4 h-4 text-zinc-500 mb-1" />
-          <p className="text-xs text-zinc-500">
+          <Upload className="w-4 h-4 text-ink-muted mb-1" />
+          <p className="text-xs font-bold text-ink-muted">
             {values.length}/{maxImages} изображения
           </p>
         </div>

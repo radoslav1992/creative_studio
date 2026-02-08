@@ -78,21 +78,21 @@ export function Sidebar() {
   return (
     <aside
       className={clsx(
-        'relative flex flex-col bg-surface-600 border-r border-white/5 transition-all duration-300',
-        collapsed ? 'w-[68px]' : 'w-[260px]'
+        'relative flex flex-col bg-white border-r-3 border-ink transition-all duration-300',
+        collapsed ? 'w-[72px]' : 'w-[260px]'
       )}
     >
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 h-16 border-b border-white/5">
-        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700">
+      <div className="flex items-center gap-3 px-4 h-16 border-b-2 border-ink">
+        <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-brand-500 border-2 border-ink shadow-brutal-sm">
           <Sparkles className="w-5 h-5 text-white" />
         </div>
         {!collapsed && (
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-white tracking-wide">
+            <span className="text-sm font-extrabold text-ink tracking-wide">
               КРЕАТИВ
             </span>
-            <span className="text-[10px] text-zinc-500 tracking-widest uppercase">
+            <span className="text-[10px] text-ink-muted tracking-widest uppercase font-bold">
               Студио
             </span>
           </div>
@@ -100,7 +100,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-3 py-4 space-y-1.5">
         {visibleNavItems.map((item) => {
           const isActive =
             item.href === '/'
@@ -113,16 +113,16 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={clsx(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-150',
                 isActive
-                  ? 'bg-brand-500/15 text-brand-300 shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                  ? 'bg-brand-100 text-brand-700 border-2 border-brand-500 shadow-brutal-brand-sm'
+                  : 'text-ink-muted hover:text-ink hover:bg-cream-200 border-2 border-transparent'
               )}
             >
               <Icon
                 className={clsx(
                   'w-5 h-5 flex-shrink-0',
-                  isActive ? 'text-brand-400' : 'text-zinc-500'
+                  isActive ? 'text-brand-600' : 'text-ink-faint'
                 )}
               />
               {!collapsed && <span>{item.label}</span>}
@@ -134,7 +134,7 @@ export function Sidebar() {
       {/* Collapse Button */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-surface-300 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-surface-100 transition-colors z-10"
+        className="absolute -right-3.5 top-20 w-7 h-7 rounded-full bg-white border-2 border-ink shadow-brutal-sm flex items-center justify-center text-ink hover:bg-brand-100 transition-colors z-10"
       >
         {collapsed ? (
           <ChevronRight className="w-3.5 h-3.5" />
@@ -144,31 +144,31 @@ export function Sidebar() {
       </button>
 
       {/* User Section */}
-      <div className="border-t border-white/5">
+      <div className="border-t-2 border-ink">
         {isAuthenticated ? (
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-cream-200 transition-colors"
             >
               {/* Avatar */}
               {session?.user?.image ? (
                 <img
                   src={session.user.image}
                   alt={session.user.name || 'Потребител'}
-                  className="w-8 h-8 rounded-full flex-shrink-0"
+                  className="w-8 h-8 rounded-lg border-2 border-ink flex-shrink-0"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-bold text-white">{userInitial}</span>
+                <div className="w-8 h-8 rounded-lg bg-brand-400 border-2 border-ink flex items-center justify-center flex-shrink-0 shadow-brutal-sm">
+                  <span className="text-xs font-extrabold text-white">{userInitial}</span>
                 </div>
               )}
               {!collapsed && (
                 <div className="flex flex-col items-start overflow-hidden">
-                  <span className="text-sm font-medium text-white truncate max-w-[160px]">
+                  <span className="text-sm font-bold text-ink truncate max-w-[160px]">
                     {session?.user?.name || 'Потребител'}
                   </span>
-                  <span className="text-[10px] text-zinc-500 truncate max-w-[160px]">
+                  <span className="text-[10px] text-ink-muted truncate max-w-[160px] font-medium">
                     {session?.user?.email}
                   </span>
                 </div>
@@ -183,32 +183,32 @@ export function Sidebar() {
                   onClick={() => setShowUserMenu(false)}
                 />
                 <div className={clsx(
-                  'absolute z-30 bottom-full mb-1 rounded-xl bg-surface-400 border border-white/10 shadow-2xl overflow-hidden',
+                  'absolute z-30 bottom-full mb-1.5 rounded-xl bg-white border-2 border-ink shadow-brutal overflow-hidden',
                   collapsed ? 'left-1 w-48' : 'left-2 right-2'
                 )}>
                   <Link
                     href="/profile"
                     onClick={() => setShowUserMenu(false)}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/5 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-ink hover:bg-cream-200 transition-colors"
                   >
-                    <User className="w-4 h-4 text-zinc-500" />
+                    <User className="w-4 h-4 text-ink-muted" />
                     Профил
                   </Link>
                   <Link
                     href="/profile"
                     onClick={() => setShowUserMenu(false)}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/5 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-ink hover:bg-cream-200 transition-colors"
                   >
-                    <Settings className="w-4 h-4 text-zinc-500" />
+                    <Settings className="w-4 h-4 text-ink-muted" />
                     Настройки
                   </Link>
-                  <div className="border-t border-white/5" />
+                  <div className="border-t-2 border-ink/10" />
                   <button
                     onClick={() => {
                       setShowUserMenu(false);
                       signOut({ callbackUrl: '/' });
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-peach-500 hover:bg-peach-100 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     Изход
@@ -222,14 +222,14 @@ export function Sidebar() {
             {collapsed ? (
               <Link
                 href="/auth/login"
-                className="flex items-center justify-center w-full py-2 rounded-lg bg-brand-500/20 text-brand-400 hover:bg-brand-500/30 transition-colors"
+                className="flex items-center justify-center w-full py-2 rounded-xl bg-brand-500 border-2 border-ink text-white hover:bg-brand-600 transition-colors shadow-brutal-sm nb-btn"
               >
                 <User className="w-4 h-4" />
               </Link>
             ) : (
               <Link
                 href="/auth/login"
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-gradient-to-r from-brand-600 to-brand-500 text-white text-sm font-medium hover:from-brand-500 hover:to-brand-400 transition-all"
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-brand-500 border-2 border-ink text-white text-sm font-bold hover:bg-brand-600 transition-all shadow-brutal-sm nb-btn"
               >
                 <User className="w-4 h-4" />
                 Влезте

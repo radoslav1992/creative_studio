@@ -65,15 +65,15 @@ export function PromptEnhancer({ prompt, category, onEnhanced, disabled }: Promp
         onClick={handleEnhance}
         disabled={disabled || isEnhancing || !prompt.trim()}
         className={clsx(
-          'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+          'nb-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border-2 transition-all',
           isEnhancing
-            ? 'bg-amber-500/20 border border-amber-500/30 text-amber-300 cursor-wait'
-            : 'bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 hover:border-amber-500/30 disabled:opacity-40 disabled:cursor-not-allowed'
+            ? 'bg-sunny-200 border-ink text-ink cursor-wait shadow-brutal-sm'
+            : 'bg-sunny-100 border-ink text-ink hover:bg-sunny-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-brutal-sm'
         )}
       >
         {isEnhancing ? (
           <>
-            <div className="w-3 h-3 border-[1.5px] border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+            <div className="w-3 h-3 border-[1.5px] border-ink/30 border-t-ink rounded-full animate-spin" />
             Подобряване...
           </>
         ) : (
@@ -88,7 +88,7 @@ export function PromptEnhancer({ prompt, category, onEnhanced, disabled }: Promp
         <button
           type="button"
           onClick={handleRevert}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/5 border border-white/10 text-zinc-400 hover:bg-white/10 hover:text-zinc-300 transition-all"
+          className="nb-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-white border-2 border-ink text-ink-muted hover:bg-cream-200 hover:text-ink transition-all shadow-brutal-sm"
         >
           <Undo2 className="w-3 h-3" />
           Върни оригинала

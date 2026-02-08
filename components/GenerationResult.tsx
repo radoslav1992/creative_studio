@@ -22,29 +22,34 @@ export function GenerationResult({ generation }: GenerationResultProps) {
 
   const statusInfo = {
     starting: {
-      icon: <Loader2 className="w-4 h-4 animate-spin text-blue-400" />,
+      icon: <Loader2 className="w-4 h-4 animate-spin text-sky-500" />,
       label: 'Стартиране...',
-      color: 'text-blue-400',
+      color: 'text-sky-600',
+      bgColor: 'bg-sky-100',
     },
     processing: {
-      icon: <Loader2 className="w-4 h-4 animate-spin text-brand-400" />,
+      icon: <Loader2 className="w-4 h-4 animate-spin text-brand-500" />,
       label: 'Обработка...',
-      color: 'text-brand-400',
+      color: 'text-brand-600',
+      bgColor: 'bg-brand-100',
     },
     succeeded: {
-      icon: <CheckCircle2 className="w-4 h-4 text-emerald-400" />,
+      icon: <CheckCircle2 className="w-4 h-4 text-mint-500" />,
       label: 'Завършено',
-      color: 'text-emerald-400',
+      color: 'text-mint-500',
+      bgColor: 'bg-mint-100',
     },
     failed: {
-      icon: <XCircle className="w-4 h-4 text-red-400" />,
+      icon: <XCircle className="w-4 h-4 text-peach-500" />,
       label: 'Грешка',
-      color: 'text-red-400',
+      color: 'text-peach-500',
+      bgColor: 'bg-peach-100',
     },
     canceled: {
-      icon: <XCircle className="w-4 h-4 text-zinc-400" />,
+      icon: <XCircle className="w-4 h-4 text-ink-muted" />,
       label: 'Отменено',
-      color: 'text-zinc-400',
+      color: 'text-ink-muted',
+      bgColor: 'bg-cream-200',
     },
   };
 
@@ -64,21 +69,17 @@ export function GenerationResult({ generation }: GenerationResultProps) {
   return (
     <div
       className={clsx(
-        'result-card rounded-xl border overflow-hidden animate-fade-in',
-        isLoading
-          ? 'border-brand-500/30 bg-surface-400'
-          : generation.status === 'succeeded'
-          ? 'border-white/5 bg-surface-400'
-          : 'border-white/5 bg-surface-400'
+        'result-card rounded-xl border-2 border-ink overflow-hidden animate-fade-in bg-white',
+        isLoading ? 'shadow-brutal-brand-sm' : 'shadow-brutal-sm'
       )}
     >
       {/* Loading state */}
       {isLoading && (
-        <div className="aspect-video flex items-center justify-center bg-surface-500">
+        <div className="aspect-video flex items-center justify-center bg-cream-200">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-16 h-16 rounded-full border-2 border-brand-500/30 border-t-brand-500 animate-spin" />
-            <p className="text-sm text-zinc-400">Генериране с {generation.modelName}...</p>
-            <p className="text-xs text-zinc-600">Това може да отнеме няколко минути</p>
+            <div className="w-16 h-16 rounded-full border-3 border-brand-200 border-t-brand-500 animate-spin" />
+            <p className="text-sm font-bold text-ink">Генериране с {generation.modelName}...</p>
+            <p className="text-xs font-medium text-ink-muted">Това може да отнеме няколко минути</p>
           </div>
         </div>
       )}
@@ -98,7 +99,7 @@ export function GenerationResult({ generation }: GenerationResultProps) {
                 key={i}
                 src={url}
                 controls
-                className="w-full aspect-video bg-black"
+                className="w-full aspect-video bg-ink"
                 preload="metadata"
               />
             ) : (
@@ -116,40 +117,40 @@ export function GenerationResult({ generation }: GenerationResultProps) {
 
       {/* Error state */}
       {generation.status === 'failed' && (
-        <div className="aspect-video flex items-center justify-center bg-surface-500">
+        <div className="aspect-video flex items-center justify-center bg-peach-100">
           <div className="flex flex-col items-center gap-3 px-6 text-center">
-            <XCircle className="w-12 h-12 text-red-400/50" />
-            <p className="text-sm text-red-400">Генерирането не успя</p>
+            <XCircle className="w-12 h-12 text-peach-500" />
+            <p className="text-sm font-bold text-ink">Генерирането не успя</p>
             {generation.error && (
-              <p className="text-xs text-zinc-500 max-w-sm">{generation.error}</p>
+              <p className="text-xs font-medium text-ink-muted max-w-sm">{generation.error}</p>
             )}
           </div>
         </div>
       )}
 
       {/* Footer */}
-      <div className="p-4 space-y-3">
+      <div className="p-4 space-y-3 border-t-2 border-ink">
         {/* Status bar */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className={clsx('flex items-center gap-2 px-2.5 py-1 rounded-lg border-2 border-ink', status.bgColor)}>
             {status.icon}
-            <span className={clsx('text-xs font-medium', status.color)}>
+            <span className={clsx('text-xs font-bold', status.color)}>
               {status.label}
             </span>
           </div>
           <div className="flex items-center gap-1">
-            <Clock className="w-3 h-3 text-zinc-600" />
-            <span className="text-[10px] text-zinc-600">
+            <Clock className="w-3 h-3 text-ink-faint" />
+            <span className="text-[10px] font-bold text-ink-faint">
               {new Date(generation.createdAt).toLocaleTimeString('bg-BG')}
             </span>
           </div>
         </div>
 
         {/* Model name */}
-        <div className="text-xs text-zinc-500">{generation.modelName}</div>
+        <div className="text-xs font-bold text-ink-muted">{generation.modelName}</div>
 
         {/* Prompt */}
-        <p className="text-sm text-zinc-300 line-clamp-2">{generation.prompt}</p>
+        <p className="text-sm font-medium text-ink line-clamp-2">{generation.prompt}</p>
 
         {/* Actions */}
         <div className="flex items-center gap-2 pt-2">
@@ -159,7 +160,7 @@ export function GenerationResult({ generation }: GenerationResultProps) {
                 href={outputs[0]}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-500/20 text-brand-300 text-xs font-medium hover:bg-brand-500/30 transition-colors"
+                className="nb-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-100 border-2 border-ink text-ink text-xs font-bold hover:bg-brand-200 transition-colors shadow-brutal-sm"
               >
                 <ExternalLink className="w-3 h-3" />
                 Отвори
@@ -167,7 +168,7 @@ export function GenerationResult({ generation }: GenerationResultProps) {
               <a
                 href={outputs[0]}
                 download
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 text-zinc-400 text-xs font-medium hover:bg-white/10 transition-colors"
+                className="nb-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border-2 border-ink text-ink text-xs font-bold hover:bg-cream-200 transition-colors shadow-brutal-sm"
               >
                 <Download className="w-3 h-3" />
                 Изтегли
@@ -176,7 +177,7 @@ export function GenerationResult({ generation }: GenerationResultProps) {
           )}
           <button
             onClick={() => removeGeneration(generation.id)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 text-zinc-500 text-xs font-medium hover:bg-red-500/20 hover:text-red-400 transition-colors ml-auto"
+            className="nb-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border-2 border-ink text-ink-muted text-xs font-bold hover:bg-peach-100 hover:text-peach-500 transition-colors shadow-brutal-sm ml-auto"
           >
             <Trash2 className="w-3 h-3" />
             Изтрий

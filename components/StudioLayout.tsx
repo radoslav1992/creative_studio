@@ -11,17 +11,17 @@ interface StudioLayoutProps {
 
 export function StudioLayout({ title, subtitle, icon, children }: StudioLayoutProps) {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-cream-100">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-surface-700/80 backdrop-blur-xl border-b border-white/5">
+      <div className="sticky top-0 z-10 bg-white border-b-2 border-ink">
         <div className="max-w-[1600px] mx-auto px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500/20 to-brand-700/20 border border-brand-500/20 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-brand-100 border-2 border-ink flex items-center justify-center shadow-brutal-sm">
               {icon}
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white">{title}</h1>
-              <p className="text-xs text-zinc-500">{subtitle}</p>
+              <h1 className="text-lg font-extrabold text-ink">{title}</h1>
+              <p className="text-xs font-bold text-ink-muted">{subtitle}</p>
             </div>
           </div>
         </div>

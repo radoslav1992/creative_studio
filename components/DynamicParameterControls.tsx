@@ -127,11 +127,11 @@ function SelectField({
 
   return (
     <div className="space-y-2">
-      <label className="flex items-center gap-1.5 text-sm font-medium text-zinc-300">
+      <label className="flex items-center gap-1.5 text-sm font-bold text-ink">
         {label}
-        {required && <span className="text-brand-400">*</span>}
+        {required && <span className="text-brand-500">*</span>}
       </label>
-      {description && <p className="text-xs text-zinc-500">{description}</p>}
+      {description && <p className="text-xs font-medium text-ink-muted">{description}</p>}
       <div className="flex flex-wrap gap-2">
         {prop.enum?.map((opt) => {
           const optStr = String(opt);
@@ -140,10 +140,10 @@ function SelectField({
               key={optStr}
               onClick={() => onChange(isNumericEnum(prop) ? Number(opt) : optStr)}
               className={clsx(
-                'px-3 py-1.5 rounded-lg text-sm font-medium border transition-all',
+                'nb-btn px-3 py-1.5 rounded-lg text-sm font-bold border-2 transition-all',
                 String(currentVal) === optStr
-                  ? 'bg-brand-500/20 border-brand-500/50 text-brand-300'
-                  : 'bg-surface-400 border-white/5 text-zinc-400 hover:text-zinc-200 hover:border-white/15'
+                  ? 'bg-brand-100 border-brand-500 text-brand-700 shadow-brutal-brand-sm'
+                  : 'bg-white border-ink text-ink-muted hover:text-ink hover:bg-cream-200 shadow-brutal-sm'
               )}
             >
               {getEnumLabel(paramKey, opt)}
@@ -176,11 +176,11 @@ function NumberField({
   if (hasRange) {
     return (
       <div className="space-y-2">
-        <label className="flex items-center justify-between text-sm font-medium text-zinc-300">
+        <label className="flex items-center justify-between text-sm font-bold text-ink">
           <span>{label}</span>
-          <span className="text-brand-400 font-mono text-sm">{currentVal}</span>
+          <span className="text-brand-600 font-mono text-sm bg-brand-50 px-2 py-0.5 rounded-lg border border-brand-200">{currentVal}</span>
         </label>
-        {description && <p className="text-xs text-zinc-500">{description}</p>}
+        {description && <p className="text-xs font-medium text-ink-muted">{description}</p>}
         <input
           type="range"
           min={prop.minimum}
@@ -188,9 +188,9 @@ function NumberField({
           step={prop.type === 'integer' ? 1 : 0.1}
           value={currentVal}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full h-1.5 rounded-full appearance-none bg-surface-200 accent-brand-500 cursor-pointer"
+          className="w-full cursor-pointer"
         />
-        <div className="flex justify-between text-[10px] text-zinc-600">
+        <div className="flex justify-between text-[10px] font-bold text-ink-faint">
           <span>{prop.minimum}</span>
           <span>{prop.maximum}</span>
         </div>
@@ -201,13 +201,13 @@ function NumberField({
   // Simple number input without range
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-zinc-300">{label}</label>
-      {description && <p className="text-xs text-zinc-500">{description}</p>}
+      <label className="text-sm font-bold text-ink">{label}</label>
+      {description && <p className="text-xs font-medium text-ink-muted">{description}</p>}
       <input
         type="number"
         value={currentVal}
         onChange={(e) => onChange(e.target.value ? Number(e.target.value) : undefined)}
-        className="w-full px-3 py-2 rounded-lg bg-surface-400 border border-white/5 text-sm text-white focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/30 transition-all"
+        className="w-full px-3 py-2 rounded-xl bg-cream-100 border-2 border-ink text-sm font-medium text-ink focus:outline-none focus:border-brand-500 focus:shadow-brutal-brand-sm transition-all"
       />
     </div>
   );
@@ -233,23 +233,23 @@ function BooleanField({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-zinc-300">{label}</label>
+        <label className="text-sm font-bold text-ink">{label}</label>
         <button
           onClick={() => onChange(!currentVal)}
           className={clsx(
-            'relative w-11 h-6 rounded-full transition-colors',
-            currentVal ? 'bg-brand-500' : 'bg-surface-200'
+            'nb-toggle relative w-12 h-7 rounded-full transition-colors',
+            currentVal ? 'bg-brand-500' : 'bg-cream-300'
           )}
         >
           <div
             className={clsx(
-              'absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform',
-              currentVal ? 'translate-x-[22px]' : 'translate-x-0.5'
+              'absolute top-[3px] w-5 h-5 rounded-full bg-white border-2 border-ink shadow-sm transition-transform',
+              currentVal ? 'translate-x-[23px]' : 'translate-x-[3px]'
             )}
           />
         </button>
       </div>
-      {description && <p className="text-xs text-zinc-500">{description}</p>}
+      {description && <p className="text-xs font-medium text-ink-muted">{description}</p>}
     </div>
   );
 }
@@ -273,14 +273,14 @@ function TextField({
   if (isTextarea) {
     return (
       <div className="space-y-2">
-        <label className="text-sm font-medium text-zinc-300">{label}</label>
-        {description && <p className="text-xs text-zinc-500">{description}</p>}
+        <label className="text-sm font-bold text-ink">{label}</label>
+        {description && <p className="text-xs font-medium text-ink-muted">{description}</p>}
         <textarea
           value={value ?? ''}
           onChange={(e) => onChange(e.target.value)}
           placeholder={description}
           rows={3}
-          className="w-full px-3 py-2 rounded-lg bg-surface-400 border border-white/5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/30 transition-all leading-relaxed"
+          className="w-full px-3 py-2 rounded-xl bg-cream-100 border-2 border-ink text-sm font-medium text-ink placeholder:text-ink-faint focus:outline-none focus:border-brand-500 focus:shadow-brutal-brand-sm transition-all leading-relaxed"
         />
       </div>
     );
@@ -288,14 +288,14 @@ function TextField({
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-zinc-300">{label}</label>
-      {description && <p className="text-xs text-zinc-500">{description}</p>}
+      <label className="text-sm font-bold text-ink">{label}</label>
+      {description && <p className="text-xs font-medium text-ink-muted">{description}</p>}
       <input
         type="text"
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value)}
         placeholder={description}
-        className="w-full px-3 py-2 rounded-lg bg-surface-400 border border-white/5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/30 transition-all"
+        className="w-full px-3 py-2 rounded-xl bg-cream-100 border-2 border-ink text-sm font-medium text-ink placeholder:text-ink-faint focus:outline-none focus:border-brand-500 focus:shadow-brutal-brand-sm transition-all"
       />
     </div>
   );
@@ -479,10 +479,10 @@ export function DynamicParameterControls({
 
       {/* Advanced parameters (collapsible) */}
       {advancedParams.length > 0 && (
-        <div className="border-t border-white/5 pt-4">
+        <div className="border-t-2 border-ink/10 pt-4">
           <button
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="flex items-center gap-2 text-xs font-medium text-zinc-500 hover:text-zinc-300 transition-colors"
+            className="flex items-center gap-2 text-xs font-bold text-ink-muted hover:text-ink transition-colors"
           >
             {showAdvanced ? (
               <ChevronUp className="w-3.5 h-3.5" />

@@ -194,14 +194,14 @@ export default function ImageStudioPage() {
     <StudioLayout
       title="Изображения Студио"
       subtitle="Създавайте и редактирайте изображения с AI"
-      icon={<ImageIcon className="w-5 h-5 text-brand-400" />}
+      icon={<ImageIcon className="w-5 h-5 text-brand-600" />}
     >
       <div className="grid grid-cols-1 xl:grid-cols-[1fr,480px] gap-6">
         {/* Left: Model selection + Generation */}
         <div className="space-y-6">
           <section>
-            <h2 className="text-sm font-semibold text-zinc-300 mb-4 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-brand-400" />
+            <h2 className="text-sm font-extrabold text-ink mb-4 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-brand-500" />
               Изберете модел
             </h2>
             <DynamicModelSelector
@@ -216,9 +216,9 @@ export default function ImageStudioPage() {
             <section className="animate-fade-in space-y-6">
               {/* Mode indicator for editing models */}
               {(hasEditingCapability || hasCharacterCapability) && (
-                <div className="flex items-center gap-2 p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-                  <Wand2 className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                  <p className="text-xs text-purple-300">
+                <div className="flex items-center gap-2 p-3 rounded-xl bg-brand-50 border-2 border-brand-300">
+                  <Wand2 className="w-4 h-4 text-brand-600 flex-shrink-0" />
+                  <p className="text-xs font-bold text-brand-700">
                     {hasCharacterCapability
                       ? 'Този модел поддържа създаване на последователни персонажи. Качете референтно изображение.'
                       : 'Този модел поддържа редактиране на изображения. Качете изображение, за да го редактирате, или оставете празно за ново генериране.'}
@@ -229,10 +229,10 @@ export default function ImageStudioPage() {
               {/* Prompt */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-1.5 text-sm font-semibold text-zinc-300">
-                    <Wand2 className="w-4 h-4 text-brand-400" />
+                  <label className="flex items-center gap-1.5 text-sm font-extrabold text-ink">
+                    <Wand2 className="w-4 h-4 text-brand-500" />
                     Промпт
-                    <span className="text-brand-400">*</span>
+                    <span className="text-brand-500">*</span>
                   </label>
                   <PromptEnhancer
                     prompt={prompt}
@@ -247,21 +247,21 @@ export default function ImageStudioPage() {
                     onChange={(e) => setPrompt(e.target.value)}
                     placeholder="Опишете изображението, което искате да създадете..."
                     rows={4}
-                    className="w-full px-4 py-3 rounded-xl bg-surface-400 border border-white/5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/30 transition-all leading-relaxed"
+                    className="w-full px-4 py-3 rounded-xl bg-white border-2 border-ink text-sm font-medium text-ink placeholder:text-ink-faint focus:outline-none focus:border-brand-500 focus:shadow-brutal-brand-sm transition-all leading-relaxed"
                   />
-                  <div className="absolute bottom-3 right-3 text-[10px] text-zinc-600">
+                  <div className="absolute bottom-3 right-3 text-[10px] font-bold text-ink-faint">
                     {prompt.length} символа
                   </div>
                 </div>
                 {promptDescription && (
-                  <p className="text-xs text-zinc-500">{promptDescription}</p>
+                  <p className="text-xs font-medium text-ink-muted">{promptDescription}</p>
                 )}
               </div>
 
               {/* Dynamic Parameters from schema */}
               {selectedModel.inputSchema && (
-                <div className="p-5 rounded-xl bg-surface-500 border border-white/5 space-y-5">
-                  <h3 className="text-sm font-semibold text-zinc-300">Настройки</h3>
+                <div className="p-5 rounded-xl bg-white border-2 border-ink shadow-brutal-sm space-y-5">
+                  <h3 className="text-sm font-extrabold text-ink">Настройки</h3>
                   <DynamicParameterControls
                     schema={selectedModel.inputSchema}
                     values={paramValues}
@@ -274,7 +274,7 @@ export default function ImageStudioPage() {
               <button
                 onClick={handleGenerate}
                 disabled={isGenerating || !prompt.trim()}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 text-white font-semibold text-sm hover:from-brand-500 hover:to-brand-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40 flex items-center justify-center gap-2"
+                className="nb-btn w-full py-3.5 rounded-xl bg-brand-500 border-2 border-ink text-white font-bold text-sm hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-brutal flex items-center justify-center gap-2"
               >
                 {isGenerating ? (
                   <>
@@ -296,10 +296,10 @@ export default function ImageStudioPage() {
 
         {/* Right: Results */}
         <div className="space-y-4">
-          <h2 className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
+          <h2 className="text-sm font-extrabold text-ink flex items-center gap-2">
             Резултати
             {imageGenerations.length > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-400 text-xs">
+              <span className="px-2.5 py-0.5 rounded-lg bg-brand-100 text-brand-700 text-xs font-bold border-2 border-brand-300">
                 {imageGenerations.length}
               </span>
             )}
@@ -307,11 +307,11 @@ export default function ImageStudioPage() {
 
           {imageGenerations.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-surface-400 border border-white/5 flex items-center justify-center mb-4">
-                <ImageIcon className="w-7 h-7 text-zinc-600" />
+              <div className="w-16 h-16 rounded-2xl bg-white border-2 border-ink shadow-brutal flex items-center justify-center mb-4">
+                <ImageIcon className="w-7 h-7 text-ink-muted" />
               </div>
-              <p className="text-sm text-zinc-500 mb-1">Все още няма генерирани изображения</p>
-              <p className="text-xs text-zinc-600">Изберете модел и въведете промпт, за да започнете</p>
+              <p className="text-sm font-bold text-ink-muted mb-1">Все още няма генерирани изображения</p>
+              <p className="text-xs font-medium text-ink-faint">Изберете модел и въведете промпт, за да започнете</p>
             </div>
           ) : (
             <div className="space-y-4">
